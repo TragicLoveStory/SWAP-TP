@@ -32,8 +32,8 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	$query=$con->prepare("INSERT INTO users (`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`,`role`) VALUES (?,?,?,?,?,?,?,?,?)");
 	$query->bind_param('sssssisss', $email, $password, $firstname, $lastname, $dateofbirth, $contact, $department, $occupation, $role);
 	if($query->execute()){ //executing query (processes and print the results)
-		// header("Location: http://localhost/SWAP-TP/index.php");
-		// die();
+		header("Location: http://localhost/SWAP-TP/userList.php");
+		die();
 		printok("Closing connection");
 	}
 	else{
@@ -59,8 +59,8 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	$query=$con->prepare("UPDATE `users` SET `email`=?, `password`=?, `first_name`=?, `last_name`=?, `date_of_birth`=?, `contact`=?, `department`=?, `occupation`=?, `role`=? WHERE `ID` = ?");
 	$query->bind_param('sssssisssi', $email, $password, $firstname, $lastname, $dateofbirth, $contact, $department, $occupation, $role, $id);
 	if($query->execute()){ //executing query (processes and print the results)
-		// header("Location: http://localhost/SWAP-TP/index.php");
-		// die();
+		header("Location: http://localhost/SWAP-TP/userList.php");
+		die();
 		printok("Closing connection");
 	}
 	else{

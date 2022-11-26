@@ -24,7 +24,7 @@
         }
         else printok("Connecting to $db_hostname");
 
-    // loading of tpshop details
+    // loading of user details
     $query=$con->prepare("select * from users");
     $query->execute();
     $query->bind_result($id, $email, $password,$firstname, $lastname, $dateofbirth, $contact, $department, $occupation, $role);
@@ -36,6 +36,39 @@
         echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$occupation</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&useremail=".$email."'>delete</a></th></tr>";
     }
     echo "</table>";
+
+    // deletion of accounts
+    if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
+        deleteItem();
+    }
+    function deleteItem() {
+        require "config.php";
+        try {
+            $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+            }
+        catch (Exception $e) {
+                printerror($e->getMessage(),$con);
+            }
+        if (!$con) {
+            printerror("Connecting to $db_hostname", $con);
+            die();
+        }
+        else printok("Connecting to $db_hostname");
+        $uri = $_SERVER['REQUEST_URI'];
+        $fullUri = "http://localhost${uri}";
+        $url_components = parse_url($fullUri);
+        parse_str($url_components['query'], $params);
+        $userEmail = $params['useremail'];
+        $query=$con->prepare("DELETE FROM users WHERE email=?");
+        $query->bind_param('s', $userEmail); //bind the parameters
+        if($query->execute()){ //executing query (processes and print the results)
+            header("Location: http://localhost/SWAP-TP/userList.php");
+            die();
+        }
+        else{
+            echo "Error Executing Query";
+        }
+    }
     ?>
     
 </body>
