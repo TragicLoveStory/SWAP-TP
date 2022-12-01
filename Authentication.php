@@ -47,9 +47,6 @@ function login($email,$password){
     $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`,`role` from users WHERE `email`=? AND `password`=?");
     $query->bind_param('ss',$email,$password);
     if($query->execute()){ //executing query (processes and print the results)
-		// header("Location: http://localhost/SWAP-TP/userList.php");
-		// die();
-		// printok("Closing connection");
         $result = $query->get_result();
         $row = $result->fetch_assoc();
         if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || $row['password'] !== $password){
@@ -57,14 +54,32 @@ function login($email,$password){
         }
         else{
             printok("Login Successful");
+			//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
+			session_set_cookie_params([
+				'lifetime' => '86400',
+				'path' => '/SWAP-TP',
+				'domain' => '',
+				'secure' => TRUE,
+				'httponly' => TRUE,
+				'samesite' => 'Strict'
+			]);
             session_start();
 	        printok("Started session"); //creates/resumes session
             $_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
             $_SESSION["role"]=$row['role'];
-            printok("Added username & role into _SESSION"); //acknowledgement
-            setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); 
-			header("Location: http://localhost/SWAP-TP/foo.php");
-			die();
+            printok("Added ID & role into _SESSION"); //acknowledgement
+            //setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
+			setcookie("Department", $row['department'], [
+				'expires' => time() + 86400,
+				'path' => '/SWAP-TP',
+				'domain' => '',
+				'secure' => TRUE,
+				'httponly' => TRUE,
+				'samesite' => 'Strict'
+			]);
+			// header("Location: http://localhost/SWAP-TP/foo.php");
+			// die();
+			//debug();
         }
 	}
 	else{
@@ -76,9 +91,7 @@ function logout(){
 	foreach ($_COOKIE as $key=>$value) {
 		foreach($_COOKIE as $key=>$value){
 			echo "Clearing: $key $value<br>";
-			setcookie($key, "", time()-1*60*60, "/SWAP-TP");
-			setcookie($key, "", time()-1*60*60, "/");  // path needs to match the initial setcookie() call
-			echo "cleared $key $value<br>";
+			setcookie($key, "", time()-1*60*60, "/SWAP-TP"); // path needs to match the initial setcookie() call
 		}
 	}
 	header("Location: http://localhost/SWAP-TP/foo.php");
