@@ -67,4 +67,5 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 		printerror("Selecting $db_database",$con);
 	}
 }
+
 ?>
