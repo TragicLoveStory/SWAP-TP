@@ -44,7 +44,7 @@ function login($email,$password){
 	}
 	else printok("Connecting to $db_hostname");
 
-    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`,`role` from users WHERE `email`=? AND `password`=?");
+    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`role` from users WHERE `email`=? AND `password`=?");
     $query->bind_param('ss',$email,$password);
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();

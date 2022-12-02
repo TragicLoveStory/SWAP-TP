@@ -28,20 +28,17 @@
         // loading of user details
         $query=$con->prepare("select * from users");
         $query->execute();
-        $query->bind_result($id, $email, $password,$firstname, $lastname, $dateofbirth, $contact, $department, $occupation, $role);
+        $query->bind_result($id, $email, $password,$firstname, $lastname, $dateofbirth, $contact, $department, $role, $status);
         echo "<table align='center' border='1'><tr>";
         echo
         "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th></tr>";
         while($query->fetch())
         {
-            echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$occupation</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&useremail=".$email."'>delete</a></th></tr>";
+            echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&useremail=".$email."'>delete</a></th></tr>";
         }
         echo "</table>";
 
         // deletion of accounts
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteItem();
-        }
         function deleteItem() {
             require "config.php";
             try {
@@ -69,6 +66,10 @@
             else{
                 echo "Error Executing Query";
             }
+        }
+
+        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
+            deleteItem();
         }
     }
     else{

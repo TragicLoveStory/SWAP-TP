@@ -10,10 +10,10 @@
 <body>
     <?php 
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Account"){
-            if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department']) && !empty($_POST['occupation']) && !empty($_POST['role'])){
-                //echo "No fields are empty<br>";
+            if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
                 require_once "userFunctions.php";
-                adduser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation'],$_POST['role']);
+                adduser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],
+                $_POST['dateofbirth'],$_POST['contact'],$_POST['department']);
             } 
             else{
                 echo "Error: No fields should be empty<br>";
@@ -45,7 +45,7 @@
     </tr>
     <tr>
         <td><label for='dateofbirth'>Date Of Birth:</label></td>
-        <td><input type='text' name='dateofbirth'><br></td>
+        <td><input type='date' name='dateofbirth'><br></td>
     </tr>
     <tr>
         <td><label for='contact'>Contact:</label></td>
@@ -55,14 +55,10 @@
         <td><label for='department'>Department:</label></td>
         <td><input type='text' name='department'><br></td>
     </tr>
-    <tr>
-        <td><label for='occupation'>Occupation:</label></td>
-        <td><input type='text' name='occupation'><br></td>
-    </tr>
-    <tr>
+    <!-- <tr>
         <td><label for='role'>Role:</label></td>
         <td><input type='text' name='role'><br></td>
-    </tr>
+    </tr> -->
     <tr>
         <td></td>
         <td style='text-align: right;'><input type='submit' value='Create Account' name='Submit'></td>
