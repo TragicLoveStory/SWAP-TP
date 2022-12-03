@@ -9,6 +9,11 @@
 </head>
 <body>
     <?php 
+        session_start();
+        if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="ADMIN"){
+            echo "Only permitted for Admins.";
+            die();
+        }
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Account"){
             if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
                 require_once "userFunctions.php";

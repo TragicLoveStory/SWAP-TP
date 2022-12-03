@@ -52,6 +52,15 @@ function login($email,$password){
             printerror("Wrong Login Credentials",$con);
         }
         else{
+			$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`workAttendance`) VALUES (?,?)");
+			$workAttendance = 1;
+			$query2->bind_param('ii',$row['ID'],$workAttendance);
+			if($query2->execute()){
+				printok("Attendance Updated.");
+			}
+			else{
+				printerror("Selecting $db_database",$con);
+			}
             printok("Login Successful");
 			session_set_cookie_params([
 				'lifetime' => '86400',
