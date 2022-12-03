@@ -11,6 +11,7 @@
     <?php 
      require "config.php";
      require "userFunctions.php";
+     require "Authentication.php";
      session_start();
      if (isset($_SESSION["ID"]) && isset($_SESSION["role"])){
         echo '<form method="post" action="Authentication.php"><input type="submit" value="Sign Out" name="Submit2" class="button"></form>';

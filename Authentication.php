@@ -31,7 +31,6 @@ function login($email,$password){
     require "config.php";
     require "userFunctions.php";
 
-    echo "testing";
 	try {
 	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
 	}
@@ -54,7 +53,6 @@ function login($email,$password){
         }
         else{
             printok("Login Successful");
-			//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
 			session_set_cookie_params([
 				'lifetime' => '86400',
 				'path' => '/SWAP-TP',
@@ -63,12 +61,34 @@ function login($email,$password){
 				'httponly' => TRUE,
 				'samesite' => 'Strict'
 			]);
-            session_start();
-	        printok("Started session"); //creates/resumes session
-            $_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
-            $_SESSION["role"]=$row['role'];
-            printok("Added ID & role into _SESSION"); //acknowledgement
-            //setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
+			session_start();
+			if(isset($_COOKIE['PHPSESSID'])){
+				echo $_COOKIE['PHPSESSID']."Redundant cookie named PHPSESSID containing session ID to be removed.";
+				setcookie('PHPSESSID', "", time()-1*60*60, "/");
+				session_unset(); // remove/unset/free all session variables
+				session_destroy(); //destroy the session ()
+
+				session_start(); //start a NEW session
+				session_regenerate_id(); //regenerate a new session ID because old one was destroyed
+				printok("Started session"); //creates/resumes session
+				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
+				$_SESSION["role"]=$row['role'];
+				printok("Added ID & role into _SESSION"); //acknowledgement
+				setcookie("Department", $row['department'], [
+					'expires' => time() + 86400,
+					'path' => '/SWAP-TP',
+					'domain' => '',
+					'secure' => TRUE,
+					'httponly' => TRUE,
+					'samesite' => 'Strict'
+				]);
+			}
+			//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
+			printok("Started session"); //creates/resumes session
+			$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
+			$_SESSION["role"]=$row['role'];
+			printok("Added ID & role into _SESSION"); //acknowledgement
+			//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
 			setcookie("Department", $row['department'], [
 				'expires' => time() + 86400,
 				'path' => '/SWAP-TP',
@@ -94,6 +114,8 @@ function logout(){
 			setcookie($key, "", time()-1*60*60, "/SWAP-TP"); // path needs to match the initial setcookie() call
 		}
 	}
+	session_unset();
+	session_destroy();
 	header("Location: http://localhost/SWAP-TP/foo.php");
 	die();
 }
