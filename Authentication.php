@@ -43,7 +43,7 @@ function login($email,$password){
 	}
 	else printok("Connecting to $db_hostname");
 
-    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`role` from users WHERE `email`=? AND `password`=?");
+    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`role`,`status` from users WHERE `email`=? AND `password`=?");
     $query->bind_param('ss',$email,$password);
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();
@@ -52,7 +52,7 @@ function login($email,$password){
             printerror("Wrong Login Credentials",$con);
         }
         else{
-			$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`workAttendance`) VALUES (?,?)");
+			$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`workAttendance`) VALUES (?,?)"); //login to become present for attendance at work
 			$workAttendance = 1;
 			$query2->bind_param('ii',$row['ID'],$workAttendance);
 			if($query2->execute()){
@@ -75,13 +75,14 @@ function login($email,$password){
 				echo $_COOKIE['PHPSESSID']."Redundant cookie named PHPSESSID containing session ID to be removed.";
 				setcookie('PHPSESSID', "", time()-1*60*60, "/");
 				session_unset(); // remove/unset/free all session variables
-				session_destroy(); //destroy the session ()
+				session_destroy(); //destroy the session 
 
 				session_start(); //start a NEW session
 				session_regenerate_id(); //regenerate a new session ID because old one was destroyed
 				printok("Started session"); //creates/resumes session
 				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
 				$_SESSION["role"]=$row['role'];
+				$_SESSION["status"]=$row['status'];
 				printok("Added ID & role into _SESSION"); //acknowledgement
 				setcookie("Department", $row['department'], [
 					'expires' => time() + 86400,
@@ -92,23 +93,30 @@ function login($email,$password){
 					'samesite' => 'Strict'
 				]);
 			}
-			//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
-			printok("Started session"); //creates/resumes session
-			$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
-			$_SESSION["role"]=$row['role'];
-			printok("Added ID & role into _SESSION"); //acknowledgement
-			//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
-			setcookie("Department", $row['department'], [
-				'expires' => time() + 86400,
-				'path' => '/SWAP-TP',
-				'domain' => '',
-				'secure' => TRUE,
-				'httponly' => TRUE,
-				'samesite' => 'Strict'
-			]);
-			// header("Location: http://localhost/SWAP-TP/foo.php");
-			// die();
-			//debug();
+			else{
+				//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
+				printok("Started session"); //creates/resumes session
+				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
+				$_SESSION["role"]=$row['role'];
+				$_SESSION["status"]=$row['status'];
+				printok("Added ID & role into _SESSION"); //acknowledgement
+				//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
+				setcookie("Department", $row['department'], [
+					'expires' => time() + 86400,
+					'path' => '/SWAP-TP',
+					'domain' => '',
+					'secure' => TRUE,
+					'httponly' => TRUE,
+					'samesite' => 'Strict'
+				]);
+				// header("Location: http://localhost/SWAP-TP/foo.php");
+				// die();
+				//debug();
+			}
+			if($_SESSION['status'] === -1){
+				header("Location: http://localhost/SWAP-TP/firstPassChange.php");
+				die();
+			}
         }
 	}
 	else{
@@ -127,5 +135,65 @@ function logout(){
 	session_destroy();
 	header("Location: http://localhost/SWAP-TP/foo.php");
 	die();
+}
+
+function firstPasswordChange($passwordInput,$confirmPasswordInput){
+	if($passwordInput !== $confirmPasswordInput){
+		echo "Passwords do not match.";
+		die();
+	}
+	require "config.php";
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+	// min & max length input validation
+	$inputArray = array($passwordInput,$confirmPasswordInput);
+	$inputNames = array('Password','Confirm Password');
+	for($counter = 0; $counter < count($inputArray); $counter++){
+		if(strlen($inputArray[$counter]) > 30){
+			echo $inputNames[$counter]." is too long!<br>";
+			die();
+		}
+		elseif(strlen($inputArray[$counter]) < 10){
+			echo $inputNames[$counter]." is too Short!<br>";
+			die();
+		}
+		else{
+
+		}
+	}
+	// regular expressions + date checking
+	$checkall = true;
+	$checkall=$checkall && inputChecker($passwordInput,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); 
+	$checkall=$checkall && inputChecker($confirmPasswordInput,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); //must have lower case, upper case, special char and number
+	if (!$checkall) {
+		echo "Error checking inputs<br>Please return to the registration form";
+		die();
+	}
+	else{
+		echo "Validated";
+	}
+	// TO DO: Hash + Salt the password input before INSERTING into table
+	$newStatus = 1;
+	$query=$con->prepare("UPDATE `users` SET `password`=?, `status`=? WHERE `ID` = ?");
+	$query->bind_param('sii',$passwordInput, $newStatus, $_SESSION['ID']);
+	if($query->execute()){ //executing query (processes and print the results)
+		printok("Closing connection");
+		echo "Logging Out. Log back in.";
+		logout();
+		// header("Location: http://localhost/SWAP-TP/loginForm.php");
+		// die();
+	}
+	else{
+		printerror("Selecting $db_database",$con);
+	}
 }
 ?>

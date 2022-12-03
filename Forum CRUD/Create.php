@@ -4,9 +4,9 @@ $now = new DateTime("now", new DateTimeZone('Asia/Singapore'));
 $now = $now->format('Y-m-d H:i:s');
 
 
-CreateForum(111, 31, "'User 31 title'", "'$now'", 0);
+CreateForum(2, "'User 31 title'", "'$now'", 32);
 
-function CreateForum($id, $userId, $title, $createOn, $viewCount)
+function CreateForum($userId, $title, $createOn, $viewCount)
 {
     require "db_config.php";
     require "displayResult.php";
@@ -17,7 +17,7 @@ function CreateForum($id, $userId, $title, $createOn, $viewCount)
     $database = mysqli_select_db($connection, $db_database);
     if (!$database) die();
 
-    $query = "INSERT INTO `internalhr`.`forum`(`id`, `userId`, `title`, `createOn`, `viewCount`) VALUES ($id, $userId, $title, $createOn, $viewCount)";
+    $query = "INSERT INTO `internalhr`.`forum`(`userId`, `title`, `createOn`, `viewCount`) VALUES ($userId, $title, $createOn, $viewCount)";
     $result = mysqli_query($connection, $query);
 
     if (!$result) display('Error while inserting the data');
