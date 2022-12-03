@@ -45,10 +45,10 @@
     </tr>
     <tr>
         <td><label for='dateofbirth'>Date Of Birth:</label></td>
-        <td><input type='date' name='dateofbirth'><br></td>
+        <td><input type='date' name='dateofbirth'  min="1900-01-01" max="<?= date('Y-m-d'); ?>" value="<?= date('Y-m-d'); ?>"><br></td>
     </tr>
     <tr>
-        <td><label for='contact'>Contact:</label></td>
+        <td><label for='contact'>Contact (+65):</label></td>
         <td><input type='text' name='contact'><br></td>
     </tr>
     <tr>

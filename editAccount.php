@@ -30,7 +30,7 @@
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Account"){
             if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
                 //echo "No fields are empty<br>";
-                edituser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['role'],$row['ID']);
+                edituser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$row['ID']);
             } 
             else{
                 echo "Error: No fields should be empty<br>";

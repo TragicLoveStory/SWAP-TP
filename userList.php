@@ -13,6 +13,7 @@
     require "userFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="ADMIN"){
+        echo "Permitted for admins";
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -31,7 +32,7 @@
         $query->bind_result($id, $email, $password,$firstname, $lastname, $dateofbirth, $contact, $department, $role, $status);
         echo "<table align='center' border='1'><tr>";
         echo
-        "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th></tr>";
+        "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Role</th></tr>";
         while($query->fetch())
         {
             echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&useremail=".$email."'>delete</a></th></tr>";
