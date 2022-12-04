@@ -52,6 +52,7 @@ function login($email,$password){
             printerror("Wrong Login Credentials",$con);
         }
         else{
+			//preliminary Attendance Checking system for employees
 			$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`workAttendance`) VALUES (?,?)"); //login to become present for attendance at work
 			$workAttendance = 1;
 			$query2->bind_param('ii',$row['ID'],$workAttendance);

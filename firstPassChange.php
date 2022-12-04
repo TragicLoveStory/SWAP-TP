@@ -13,7 +13,7 @@
      require "userFunctions.php";
      require "Authentication.php";
      session_start();
-     if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION['role'] !== 'USER' || $_SESSION['status'] !== -1){
+     if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION['status'] !== -1){
         echo 'Permission Denied';
         die();
      }
