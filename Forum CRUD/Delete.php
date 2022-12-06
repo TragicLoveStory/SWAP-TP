@@ -1,6 +1,6 @@
 <?php
 
-DeleteForum(111);
+DeleteForum(112);
 
 function DeleteForum($id)
 {

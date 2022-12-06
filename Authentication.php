@@ -62,6 +62,7 @@ function login($email,$password){
 			else{
 				printerror("Selecting $db_database",$con);
 			}
+			//preliminary Attendance Checking system for employees
             printok("Login Successful");
 			session_set_cookie_params([
 				'lifetime' => '86400',

@@ -75,6 +75,7 @@
     }
     else{
         echo "Only permitted for Admins.";
+        die();
     }
     ?>
     
