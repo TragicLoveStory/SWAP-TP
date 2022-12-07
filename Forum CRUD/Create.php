@@ -4,7 +4,7 @@ $now = new DateTime("now", new DateTimeZone('Asia/Singapore'));
 $now = $now->format('Y-m-d H:i:s');
 
 
-CreateForum(2, "'User 31 title'", "'$now'", 32);
+CreateForum(2, "'Forum Created'", "'$now'", 47);
 
 function CreateForum($userId, $title, $createOn, $viewCount)
 {

@@ -1,7 +1,7 @@
 <?php
 
 
-UpdateForumTitleById(7, "My Updated Title");
+UpdateForumTitleById(117, "Updated");
 
 function UpdateForumTitleById($id, $title)
 {
