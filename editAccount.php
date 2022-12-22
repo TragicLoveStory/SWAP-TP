@@ -9,6 +9,12 @@
 </head>
 <body>
 <?php 
+        session_start();
+        if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="USER-ADMIN"){
+            echo "Only permitted for User Admins.";
+            die();
+        } 
+
         $uri = $_SERVER['REQUEST_URI'];
         $fullUri = "http://localhost${uri}";
         require_once "userFunctions.php";
@@ -50,7 +56,7 @@
     </tr>
     <tr>
         <td><label for='password'>Password:</label></td>
-        <td><input type='text' name='password' value= '<?= $row['password'] ?>'><br></td>
+        <td><input type='text' name='password'><br></td>
     </tr>
     <tr>
         <td><label for='firstname'>First Name:</label></td>
@@ -62,7 +68,7 @@
     </tr>
     <tr>
         <td><label for='dateofbirth'>Date Of Birth:</label></td>
-        <td><input type='text' name='dateofbirth' value= '<?= $row['date_of_birth'] ?>'><br></td>
+        <td><input type='date' name='dateofbirth'  min="1900-01-01" max="<?= date('Y-m-d'); ?>" value="<?= $row['date_of_birth'] ?>"><br></td>
     </tr>
     <tr>
         <td><label for='contact'>Contact:</label></td>

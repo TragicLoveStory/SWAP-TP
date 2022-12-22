@@ -43,12 +43,12 @@ function login($email,$password){
 	}
 	else printok("Connecting to $db_hostname");
 
-    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`role`,`status` from users WHERE `email`=? AND `password`=?");
-    $query->bind_param('ss',$email,$password);
+    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`role`,`status` from users WHERE `email`=?");
+    $query->bind_param('s',$email);
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();
         $row = $result->fetch_assoc();
-        if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || $row['password'] !== $password){
+        if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || !password_verify($password,$row['password'])){
             printerror("Wrong Login Credentials",$con);
         }
         else{
@@ -135,7 +135,7 @@ function logout(){
 	}
 	session_unset();
 	session_destroy();
-	header("Location: http://localhost/SWAP-TP/foo.php");
+	header("Location: http://localhost/SWAP-TP/loginForm.php");
 	die();
 }
 
@@ -183,16 +183,17 @@ function firstPasswordChange($passwordInput,$confirmPasswordInput){
 	else{
 		echo "Validated";
 	}
-	// TO DO: Hash + Salt the password input before INSERTING into table
+	// htmlspecialchars
+	$sanitizedPasswordInput = htmlspecialchars($passwordInput);
+	//hashing password
+	$hashed_password = password_hash($sanitizedPasswordInput,PASSWORD_DEFAULT);
 	$newStatus = 1;
 	$query=$con->prepare("UPDATE `users` SET `password`=?, `status`=? WHERE `ID` = ?");
-	$query->bind_param('sii',$passwordInput, $newStatus, $_SESSION['ID']);
+	$query->bind_param('sii',$hashed_password, $newStatus, $_SESSION['ID']);
 	if($query->execute()){ //executing query (processes and print the results)
 		printok("Closing connection");
 		echo "Logging Out. Log back in.";
 		logout();
-		// header("Location: http://localhost/SWAP-TP/loginForm.php");
-		// die();
 	}
 	else{
 		printerror("Selecting $db_database",$con);

@@ -110,4 +110,35 @@ function viewCounter($viewCount,$forumID){
 		printerror("Selecting $db_database",$con);
 	}
 }
+// edit forum threads
+function editThread($title,$content,$forumID){
+    require "config.php";
+    require "userFunctions.php";
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+    //input validation
+    $sanitizedTitle = htmlspecialchars($title);
+    $sanitizedContent = htmlspecialchars($content);
+    //SQL statement
+    date_default_timezone_set('Singapore');
+    $date = date('y/m/d H:i:s', time());
+    $query=$con->prepare("UPDATE `forum` SET `title`=?, `content`=?,`lastEdited` =? WHERE `id`=?");
+	$query->bind_param('sssi', $sanitizedTitle,$sanitizedContent,$date,$forumID);
+	if($query->execute()){ //executing query (processes and print the results)
+        header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=$forumID");
+        die();
+	}
+	else{
+		printerror("Selecting $db_database",$con);
+	}
+}
 ?>

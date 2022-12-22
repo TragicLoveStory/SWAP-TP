@@ -8,15 +8,14 @@
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"> -->
 </head>
 <body>
-    <form action="createThread.php" method="POST">
-        <input type="submit" value="Create a forum post">
-    </form>
+    
     <?php 
     require "config.php";
     require "userFunctions.php";
     require "forumFunctions.php";
     session_start();
-    if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "USER"){
+    if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] !== "FORUM-ADMIN"){
+        echo '<form action="createThread.php" method="POST"><input type="submit" value="Create a forum post"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -30,19 +29,20 @@
             }
         else printok("Connecting to $db_hostname");
         // loading of forum details
-        $query=$con->prepare("SELECT forum.id, users.email, forum.title, forum.createOn, forum.viewCount, forum.status FROM forum INNER JOIN users ON forum.userId = users.ID");
+        $query=$con->prepare("SELECT forum.id, users.email, forum.title, forum.createOn, forum.lastEdited, forum.viewCount, forum.status FROM forum INNER JOIN users ON forum.userId = users.ID");
         $query->execute();
-            $query->bind_result($id, $email, $title, $createOn, $viewCount,$status);
+            $query->bind_result($id, $email, $title, $createOn, $lastEdited, $viewCount,$status);
             echo "<table align='center' border='1'><tr>";
             echo
-            "<th>email</th><th>title</th><th>createOn</th><th>viewCount</th></tr>";
+            "<th>email</th><th>title</th><th>createOn</th><th>lastEdited</th><th>viewCount</th></tr>";
             while($query->fetch())
             {
-                echo "<tr><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$viewCount</th></tr>";
+                echo "<tr><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$lastEdited</th><th>$viewCount</th></tr>";
             }
             echo "</table>";
     }
-    elseif(isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "ADMIN"){
+    elseif(isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "FORUM-ADMIN"){
+        echo '<form action="createThread.php" method="POST"><input type="submit" value="Create a forum post"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -56,12 +56,12 @@
             }
         else printok("Connecting to $db_hostname");
         // loading of forum details
-        $query=$con->prepare("SELECT forum.id, users.email, forum.title, forum.createOn, forum.viewCount, forum.status FROM forum INNER JOIN users ON forum.userId = users.ID");
+        $query=$con->prepare("SELECT forum.id, users.email, forum.title, forum.createOn, forum.lastEdited, forum.viewCount, forum.status FROM forum INNER JOIN users ON forum.userId = users.ID");
         $query->execute();
-            $query->bind_result($id, $email, $title, $createOn, $viewCount,$status);
+            $query->bind_result($id, $email, $title, $createOn, $lastEdited, $viewCount,$status);
             echo "<table align='center' border='1'><tr>";
             echo
-            "<th>id</th><th>email</th><th>title</th><th>createOn</th><th>viewCount</th><th>Status</th></tr>";
+            "<th>id</th><th>email</th><th>title</th><th>createOn</th><th>lastEdited</th><th>viewCount</th><th>Status</th></tr>";
             while($query->fetch())
             {
                 if($status == 1){
@@ -70,7 +70,7 @@
                 elseif($status == 0){
                     $archiveState = "Unarchive";
                 }
-                echo "<tr><th>$id</th><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$viewCount</th><th>$status</th><th><a href='Forum.php?Archive=true&AID=".$status."&FD=".$id."'>$archiveState</a></th><th><a href='Forum.php?deletion=true&FD=".$id."'>Delete</a></th></tr>";
+                echo "<tr><th>$id</th><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$lastEdited</th><th>$viewCount</th><th>$status</th><th><a href='Forum.php?Archive=true&AID=".$status."&FD=".$id."'>$archiveState</a></th><th><a href='Forum.php?deletion=true&FD=".$id."'>Delete</a></th></tr>";
             }
             echo "</table>";
         if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {

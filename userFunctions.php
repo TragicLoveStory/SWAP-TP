@@ -34,6 +34,10 @@ function dateCheck($dateOfBirth){
 	
 }
 
+// function dateTimeCheck(){
+// 	echo "To be done.";
+// }
+
 function inputChecker($input,$regexPattern){
 	if(empty($input)){
 		return false;
@@ -121,12 +125,21 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	else{
 		echo "Validated";
 	}
-	// TO DO: Hash + Salt the password input before INSERTING into table
+	// htmlspecialchars  (defence against XSS)
+	$sanitizedEmail = htmlspecialchars($email);
+	$sanitizedPassword = htmlspecialchars($password);
+	$sanitizedFirstName = htmlspecialchars($firstname);
+	$sanitizedLastName = htmlspecialchars($lastname);
+	$sanitizedDateOfBirth = htmlspecialchars($dateofbirth);
+	$sanitizedContact = htmlspecialchars($contact);
+	$sanitizedDepartment = htmlspecialchars($department);
+	//hashing password
+	$hashed_password = password_hash($sanitizedPassword,PASSWORD_DEFAULT);
 	$query=$con->prepare("INSERT INTO users (`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`) VALUES (?,?,?,?,?,?,?)");
-	$query->bind_param('sssssis', $email, $password, $firstname, $lastname, $dateofbirth, $contact, $department);
+	$query->bind_param('sssssis', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment);
 	if($query->execute()){ //executing query (processes and print the results)
-		// header("Location: http://localhost/SWAP-TP/userList.php");
-		// die();
+		header("Location: http://localhost/SWAP-TP/userList.php");
+		die();
 		printok("Closing connection");
 	}
 	else{
@@ -208,9 +221,18 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	else{
 		echo "Validated";
 	}
-
+	// htmlspecialchars  (defence against XSS)
+	$sanitizedEmail = htmlspecialchars($email);
+	$sanitizedPassword = htmlspecialchars($password);
+	$sanitizedFirstName = htmlspecialchars($firstname);
+	$sanitizedLastName = htmlspecialchars($lastname);
+	$sanitizedDateOfBirth = htmlspecialchars($dateofbirth);
+	$sanitizedContact = htmlspecialchars($contact);
+	$sanitizedDepartment = htmlspecialchars($department);
+	//hashing password
+	$hashed_password = password_hash($sanitizedPassword,PASSWORD_DEFAULT);
 	$query=$con->prepare("UPDATE `users` SET `email`=?, `password`=?, `first_name`=?, `last_name`=?, `date_of_birth`=?, `contact`=?, `department`=? WHERE `ID` = ?");
-	$query->bind_param('sssssisi', $email, $password, $firstname, $lastname, $dateofbirth, $contact, $department,$id);
+	$query->bind_param('sssssisi', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$id);
 	if($query->execute()){ //executing query (processes and print the results)
 		header("Location: http://localhost/SWAP-TP/userList.php");
 		die();
@@ -218,6 +240,35 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	}
 	else{
 		printerror("Selecting $db_database",$con);
+	}
+}
+// deletion of accounts
+function deleteItem() {
+	require "config.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+	$uri = $_SERVER['REQUEST_URI'];
+	$fullUri = "http://localhost${uri}";
+	$url_components = parse_url($fullUri);
+	parse_str($url_components['query'], $params);
+	$userEmail = $params['TheUserId'];
+	$query=$con->prepare("DELETE FROM `users` WHERE `ID`=?");
+	$query->bind_param('s', $userEmail); //bind the parameters
+	if($query->execute()){ //executing query (processes and print the results)
+		header("Location: http://localhost/SWAP-TP/userList.php");
+		die();
+	}
+	else{
+		echo "Error Executing Query";
 	}
 }
 

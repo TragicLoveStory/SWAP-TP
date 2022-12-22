@@ -10,8 +10,8 @@
 <body>
     <?php 
         session_start();
-        if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="ADMIN"){
-            echo "Only permitted for Admins.";
+        if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="USER-ADMIN"){
+            echo "Only permitted for User Admins.";
             die();
         }
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Account"){

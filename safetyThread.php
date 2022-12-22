@@ -32,36 +32,21 @@
             printok("Connecting to $db_hostname");
         }
         // loading of thread details
-        $query=$con->prepare("SELECT forum.userId, users.email,users.first_name,users.last_name, forum.title, forum.content, forum.createOn, forum.lastEdited, forum.viewCount, forum.status FROM forum INNER JOIN users ON forum.userId = users.ID WHERE forum.id=?"); 
-        $query->bind_param('i',$_GET['forumID']);
+        $query=$con->prepare("SELECT `safetyTitle`,`safetyContent`,`videoLink`,`createOn`,`lastEdited` from `workplacesafety` WHERE id=?"); 
+        $query->bind_param('i',$_GET['safetyID']);
         if($query->execute()){ //executing query (processes and print the results)
             $result = $query->get_result();
             $row = $result->fetch_assoc(); 
         }
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteThread();
-        }
-        viewCounter($row['viewCount'],$_GET['forumID']);
     ?>
-    <?php if($_SESSION['ID'] == $row['userId']) : ?>
-        <table align='center' border='1'>
+    <table align='center' border='1'>
             <tr>
-                <th>email</th><th>first name</th><th>last name</th><th>title</th><th>content</th><th>createOn</th><th>lastEdited</th><th>viewCount</th>
+                <th>safetyTitle</th><th>safetyContent</th><th>videoLink</th><th>createOn</th><th>lastEdited</th>
             </tr>
             <tr>
-                <th><?= $row['email'] ?></th><th><?= $row['first_name'] ?></th><th><?= $row['last_name'] ?></th><th><?= $row['title'] ?></th><th class="Content"><span style="white-space: pre-wrap;"><?= $row['content'] ?></span></th><th><?= $row['createOn'] ?></th><th><?= $row['lastEdited'] ?></th><th><?= $row['viewCount']+1 ?></th><th><a href='editThread.php?editing=true&forumID=<?= $_GET['forumID'] ?>'>Edit</a></th><th><a href='forumThread.php?deletion=true&FD=<?= $_GET['forumID'] ?>'>Delete</a></th>
-            </tr>
-        </table>
-    <?php else : ?>
-        <table align='center' border='1'>
-            <tr>
-                <th>email</th><th>first name</th><th>last name</th><th>title</th><th>content</th><th>createOn</th><th>lastEdited</th><th>viewCount</th>
-            </tr>
-            <tr>
-                <th><?= $row['email'] ?></th><th><?= $row['first_name'] ?></th><th><?= $row['last_name'] ?></th><th><?= $row['title'] ?></th><th class="Content"><span style="white-space: pre-wrap;"><?= $row['content'] ?></span></th><th><?= $row['createOn'] ?></th><th><?= $row['lastEdited'] ?></th><th><?= $row['viewCount']+1 ?></th>
+                <th><?= $row['safetyTitle'] ?></th><th><?= $row['safetyContent'] ?></th><th><?= $row['videoLink'] ?></th><th><?= $row['createOn'] ?></th><th><?= $row['lastEdited'] ?></th>
             </tr>
         </table>
-    <?php endif; ?>
     <style>
         .Content{
             max-width: 300px;

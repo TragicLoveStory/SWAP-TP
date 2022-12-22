@@ -17,7 +17,6 @@
         echo 'Permission Denied';
         die();
      }
-     echo $_SESSION["status"];
      if(isset($_POST['Submit']) && $_POST['Submit'] === "Change Password"){
         if(!empty($_POST['password']) && !empty($_POST['confirmPassword'])){
             if($_POST['password'] === $_POST['confirmPassword']){

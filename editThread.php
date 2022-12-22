@@ -10,37 +10,55 @@
 <body>
     <?php 
         session_start();
+        $uri = $_SERVER['REQUEST_URI'];
+        $fullUri = "http://localhost${uri}";
         if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
             echo "Must be logged in.";
             die();
         }
-        if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Thread"){
+        require_once "config.php";
+        if(isset($_GET['editing']) && $_GET['editing']==="true"){
+            $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+            if (!$con){
+                die('Could not connect: ' . mysqli_connect_errno()); 
+            }
+            $query=$con->prepare("SELECT `title`,`content`,`userId` FROM `forum` WHERE `id` =?");
+            $query->bind_param('i', $_GET['forumID']); //bind the parameters
+            $query->execute();
+            $result = $query-> get_result();
+            $row = $result -> fetch_assoc();
+        }  
+        if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Thread"){
             if(!empty($_POST['title']) && !empty($_POST['content'])){
                 require_once "forumFunctions.php";
-                createThread($_POST['title'],$_POST['content']);
+                editThread($_POST['title'],$_POST['content'],$_GET['forumID']);
             }
             else{
                 echo "Error: No fields should be empty<br>";
             }
         }
+        if($_SESSION['ID'] !== $row['userId']){
+            echo "Access forbidden. Unable to edit other user's threads";
+            die();
+        }
     ?>
-    <form action="createThread.php" method='post'>
+    <form action="<?= $fullUri ?>" method='post'>
     <table style='text-align: left; margin-left: auto; margin-right: auto;'>
     <tr>
         <th></th>
-        <th style='text-align: center;'>Create A New Thread</th>
+        <th style='text-align: center;'>Edit Thread</th>
     </tr>
     <tr>
         <td><label for='title'>Title:</label></td>
-        <td><input type='text' name='title'><br></td>
+        <td><input type='text' name='title' value="<?= $row['title'] ?>"><br></td>
     </tr>
     <tr>
         <td><label for='content'>Content:</label></td>
-        <td><textarea name="content" rows="8" cols="50" style="resize:none; white-space: pre-wrap;"></textarea><br></td>
+        <td><textarea name="content" rows="8" cols="50" style="resize:none"><?= $row['content'] ?></textarea><br></td>
     </tr>
     <tr>
         <td></td>
-        <td style='text-align: right;'><input type='submit' value='Create Thread' name='Submit'></td>
+        <td style='text-align: right;'><input type='submit' value='Edit Thread' name='Submit'></td>
     </tr>  
     </table>
     </form>

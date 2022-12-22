@@ -12,8 +12,8 @@
     require "config.php";
     require "userFunctions.php";
     session_start();
-    if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="ADMIN"){
-        echo "Permitted for admins";
+    if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="USER-ADMIN"){
+        echo "Permitted for User Admins";
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -35,39 +35,9 @@
         "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Role</th></tr>";
         while($query->fetch())
         {
-            echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&useremail=".$email."'>delete</a></th></tr>";
+            echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&TheUserId=".$id."'>delete</a></th></tr>";
         }
         echo "</table>";
-
-        // deletion of accounts
-        function deleteItem() {
-            require "config.php";
-            try {
-                $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
-                }
-            catch (Exception $e) {
-                    printerror($e->getMessage(),$con);
-                }
-            if (!$con) {
-                printerror("Connecting to $db_hostname", $con);
-                die();
-            }
-            else printok("Connecting to $db_hostname");
-            $uri = $_SERVER['REQUEST_URI'];
-            $fullUri = "http://localhost${uri}";
-            $url_components = parse_url($fullUri);
-            parse_str($url_components['query'], $params);
-            $userEmail = $params['useremail'];
-            $query=$con->prepare("DELETE FROM users WHERE email=?");
-            $query->bind_param('s', $userEmail); //bind the parameters
-            if($query->execute()){ //executing query (processes and print the results)
-                header("Location: http://localhost/SWAP-TP/userList.php");
-                die();
-            }
-            else{
-                echo "Error Executing Query";
-            }
-        }
 
         if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
             deleteItem();
@@ -80,6 +50,14 @@
     ?>
     
 </body>
+<style>
+        th{
+            max-width: 200px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+</style>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script> Include EVERY OTHER HTML Files to this file -->
     <!-- <script>
