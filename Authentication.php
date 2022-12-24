@@ -27,6 +27,47 @@ if(isset($_POST['Submit2']) && $_POST['Submit2'] === "Sign Out"){
     logout();
 }
 
+function attendanceCheck($ID){
+	require "config.php";
+
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+	// check if attendance was already taken(first login of the day POST)
+	date_default_timezone_set('Singapore');
+	$date = date('Y-m-d', time());
+	$dateCheck = $date."%";
+	$query=$con->prepare("SELECT `Date` FROM `attendance` WHERE `Date` LIKE ? AND `userId` = ?");
+	$query->bind_param('si', $dateCheck,$ID); //bind the parameters
+	$query->execute();
+	$result = $query-> get_result();
+	$row = $result -> fetch_assoc();
+	if ($row) {
+		echo "Attendance has already been taken today.";
+   	}
+	else{
+		$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`status`,`Date`) VALUES (?,?,?)"); //login to become present for attendance at work
+		$workAttendance = 1;
+		date_default_timezone_set('Singapore');
+		$date = date('Y-m-d H:i:s', time());
+		$query2->bind_param('iis',$ID,$workAttendance,$date);
+		if($query2->execute()){
+			printok("Attendance Updated.");
+		}
+		else{
+			printerror("Selecting $db_database",$con);
+		}
+	}	
+}
+
 function login($email,$password){
     require "config.php";
     require "userFunctions.php";
@@ -52,17 +93,8 @@ function login($email,$password){
             printerror("Wrong Login Credentials",$con);
         }
         else{
-			//preliminary Attendance Checking system for employees
-			$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`workAttendance`) VALUES (?,?)"); //login to become present for attendance at work
-			$workAttendance = 1;
-			$query2->bind_param('ii',$row['ID'],$workAttendance);
-			if($query2->execute()){
-				printok("Attendance Updated.");
-			}
-			else{
-				printerror("Selecting $db_database",$con);
-			}
-			//preliminary Attendance Checking system for employees
+			attendanceCheck($row['ID']);
+
             printok("Login Successful");
 			session_set_cookie_params([
 				'lifetime' => '86400',
@@ -74,7 +106,7 @@ function login($email,$password){
 			]);
 			session_start();
 			if(isset($_COOKIE['PHPSESSID'])){
-				echo $_COOKIE['PHPSESSID']."Redundant cookie named PHPSESSID containing session ID to be removed.";
+				echo $_COOKIE['PHPSESSID']."<br>Redundant cookie named PHPSESSID containing session ID to be removed.";
 				setcookie('PHPSESSID', "", time()-1*60*60, "/");
 				session_unset(); // remove/unset/free all session variables
 				session_destroy(); //destroy the session 

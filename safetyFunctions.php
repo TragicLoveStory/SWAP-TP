@@ -49,7 +49,7 @@ function editSafetyThread($title,$content,$videoLink,$safetyID){
     $sanitizedVideoLink = htmlspecialchars($videoLink);
     //SQL statement
     date_default_timezone_set('Singapore');
-    $date = date('y/m/d H:i:s', time());
+    $date = date('Y/m/d H:i:s', time());
     $query=$con->prepare("UPDATE `workplacesafety` SET `safetyTitle`=?, `safetyContent`=?, `videoLink`=?,`lastEdited` =? WHERE `id`=?");
 	$query->bind_param('ssssi', $sanitizedTitle,$sanitizedContent,$sanitizedVideoLink,$date,$safetyID);
 	if($query->execute()){ //executing query (processes and print the results)
