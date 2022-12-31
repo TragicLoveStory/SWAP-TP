@@ -28,17 +28,17 @@
             }
         else printok("Connecting to $db_hostname");
         // loading of user details
-        $query=$con->prepare("select * from medicalcertificate");
+        $query=$con->prepare("select `id`,`userId`,`mcFile`,`Days`,`timeOfSubmission`,`status`from medicalcertificate");
         $query->execute();
-        $query->bind_result($id, $userId, $mcFile,$timeOfSubmission,$status);
+        $query->bind_result($id, $userId, $mcFile, $Days, $timeOfSubmission,$status);
         echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
         echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
         echo "<table align='center' border='1'><tr>";
         echo
-        "<th>id</th><th>userId</th><th>mcFile</th><th>mcFile</th><th>timeOfSubmission</th><th>status</th></tr>";
+        "<th>id</th><th>userId</th><th>mcFile</th><th>mcFile</th><th>Days</th><th>timeOfSubmission</th><th>status</th></tr>";
         while($query->fetch()){
             $fileName = basename("/".$mcFile);
-            echo "<th>$id</th><th>$userId</th><th><img src='$mcFile' class='image'></th><th>$fileName</th><th>$timeOfSubmission</th><th>$status</th><th><a href='mcList.php?deletion=true&mcID=".$id."'>Delete</a></th></tr>";
+            echo "<th>$id</th><th>$userId</th><th><img src='$mcFile' class='image'></th><th>$fileName</th><th>$Days</th><th>$timeOfSubmission</th><th>$status</th><th><a href='mcList.php?deletion=true&mcID=".$id."'>Delete</a></th></tr>";
         }
         echo "</table>";
 

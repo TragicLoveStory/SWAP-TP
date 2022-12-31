@@ -16,21 +16,16 @@
         die();
     }  
 
-    if(isset($_POST['Submit']) && $_POST['Submit'] === "Upload MC"){
-        //client side size validation FOR User Experience
-        if ($_FILES["uploadMC"]["size"] > 1000000) {
-            echo "File size is too large.";
-            die();
-        }
-        submitMC($_POST['mcDays']);
+    if(isset($_POST['Submit']) && $_POST['Submit'] === "Submit Work Leave"){
+        submitLeave($_POST['submitLeave'],$_POST['reasonForLeave']);
     }
     ?>
-    <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">
-        <label for='mcDays'>Number of days for work leave:</label>
-        <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
-        <label for='uploadMC'>Upload MC:</label>
-        <input type="file" name="uploadMC">
-        <input type="submit" value="Upload MC" name="Submit">
+    <form action="submitLeave.php" method="post" style="text-align: center;">
+        <label for='submitLeave'>Number of days for work leave:</label>
+        <input type="number" id="submitLeave" name="submitLeave" min="1" max="60"><br>
+        <label for='reasonForLeave'>Reason for work leave:</label>
+        <input type="text" id="reasonForLeave" name="reasonForLeave"><br>
+        <input type="submit" value="Submit Work Leave" name="Submit">
     </form>
 </body>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>

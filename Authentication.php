@@ -84,7 +84,7 @@ function login($email,$password){
 	}
 	else printok("Connecting to $db_hostname");
 
-    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`role`,`status` from users WHERE `email`=?");
+    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`,`role`,`status` from users WHERE `email`=?");
     $query->bind_param('s',$email);
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();
@@ -116,6 +116,8 @@ function login($email,$password){
 				printok("Started session"); //creates/resumes session
 				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
 				$_SESSION["role"]=$row['role'];
+				$_SESSION["occupation"]=$row['occupation'];
+				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
 				printok("Added ID & role into _SESSION"); //acknowledgement
 				setcookie("Department", $row['department'], [
@@ -132,6 +134,8 @@ function login($email,$password){
 				printok("Started session"); //creates/resumes session
 				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
 				$_SESSION["role"]=$row['role'];
+				$_SESSION["occupation"]=$row['occupation'];
+				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
 				printok("Added ID & role into _SESSION"); //acknowledgement
 				//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)

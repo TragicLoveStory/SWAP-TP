@@ -15,22 +15,23 @@
        echo "Must be logged in.";
         die();
     }  
-
-    if(isset($_POST['Submit']) && $_POST['Submit'] === "Upload MC"){
+    $uri = $_SERVER['REQUEST_URI'];
+    $fullUri = "http://localhost${uri}";
+    if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit MC"){
         //client side size validation FOR User Experience
-        if ($_FILES["uploadMC"]["size"] > 1000000) {
+        if ($_FILES["editMC"]["size"] > 1000000) {
             echo "File size is too large.";
             die();
         }
-        submitMC($_POST['mcDays']);
+        editMC($_POST['mcDays']);
     }
     ?>
-    <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">
+    <form action="<?= $fullUri ?>" method="post" enctype="multipart/form-data" style="text-align: center;">
         <label for='mcDays'>Number of days for work leave:</label>
         <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
-        <label for='uploadMC'>Upload MC:</label>
-        <input type="file" name="uploadMC">
-        <input type="submit" value="Upload MC" name="Submit">
+        <label for='editMC'>Edit MC:</label>
+        <input type="file" name="editMC">
+        <input type="submit" value="Edit MC" name="Submit">
     </form>
 </body>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>

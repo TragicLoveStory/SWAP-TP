@@ -17,8 +17,7 @@
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Account"){
             if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
                 require_once "userFunctions.php";
-                adduser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],
-                $_POST['dateofbirth'],$_POST['contact'],$_POST['department']);
+                adduser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'], $_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation']);
             } 
             else{
                 echo "Error: No fields should be empty<br>";
@@ -59,6 +58,10 @@
     <tr>
         <td><label for='department'>Department:</label></td>
         <td><input type='text' name='department'><br></td>
+    </tr>
+    <tr>
+        <td><label for='occupation'>Occupation:</label></td>
+        <td><input type='text' name='occupation'><br></td>
     </tr>
     <!-- <tr>
         <td><label for='role'>Role:</label></td>

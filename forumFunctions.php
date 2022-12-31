@@ -129,7 +129,7 @@ function editThread($title,$content,$forumID){
     $sanitizedTitle = htmlspecialchars($title);
     $sanitizedContent = htmlspecialchars($content);
     //SQL statement
-    date_default_timezone_set('Singapore');
+    date_default_timezone_set('Asia/Singapore');
     $date = date('Y/m/d H:i:s', time());
     $query=$con->prepare("UPDATE `forum` SET `title`=?, `content`=?,`lastEdited` =? WHERE `id`=?");
 	$query->bind_param('sssi', $sanitizedTitle,$sanitizedContent,$date,$forumID);

@@ -53,7 +53,7 @@ function inputChecker($input,$regexPattern){
 	}
 }
 
-function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact, $department) {
+function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$occupation) {
 	require "config.php";
 	try {
 	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -68,8 +68,8 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	else printok("Connecting to $db_hostname");
 
 	// min & max length input validation
-	$inputArray = array($email,$password,$firstname,$lastname,$dateofbirth,$contact,$department);
-	$inputNames = array('Email','Password','First Name','Last Name','Date Of Birth','Contact','Department');
+	$inputArray = array($email,$password,$firstname,$lastname,$dateofbirth,$contact,$department,$occupation);
+	$inputNames = array('Email','Password','First Name','Last Name','Date Of Birth','Contact','Department','Occupation');
 	for($counter = 0; $counter < count($inputArray); $counter++){
 		if($counter == 2 || $counter == 3){
 			if(strlen($inputArray[$counter]) > 20){
@@ -89,7 +89,7 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 				die();
 			}
 		}
-		elseif($counter == 6){
+		elseif($counter == 6 || $counter == 7){
 			if(strlen($inputArray[$counter]) > 20){
 				echo $inputNames[$counter]." is too long!<br>";
 				die();
@@ -118,6 +118,7 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	$checkall=$checkall && dateCheck($dateofbirth); 
 	$checkall=$checkall && inputChecker($contact,"/(6|8|9)\d{7}/"); //only allow singaporean phone number
 	$checkall=$checkall && inputChecker($department,"/^[A-Za-z\s]+$/"); //only allow letters
+	$checkall=$checkall && inputChecker($occupation,"/^[A-Za-z\s]+$/"); //only allow letters
 	if (!$checkall) {
 		echo "Error checking inputs<br>Please return to the registration form";
 		die();
@@ -133,10 +134,11 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	$sanitizedDateOfBirth = htmlspecialchars($dateofbirth);
 	$sanitizedContact = htmlspecialchars($contact);
 	$sanitizedDepartment = htmlspecialchars($department);
+	$sanitizedOccupation = htmlspecialchars($occupation);
 	//hashing password
 	$hashed_password = password_hash($sanitizedPassword,PASSWORD_DEFAULT);
-	$query=$con->prepare("INSERT INTO users (`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`) VALUES (?,?,?,?,?,?,?)");
-	$query->bind_param('sssssis', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment);
+	$query=$con->prepare("INSERT INTO users (`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`) VALUES (?,?,?,?,?,?,?,?)");
+	$query->bind_param('sssssiss', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$sanitizedOccupation);
 	if($query->execute()){ //executing query (processes and print the results)
 		header("Location: http://localhost/SWAP-TP/userList.php");
 		die();
@@ -147,7 +149,7 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	}
 }
 
-function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$id){
+function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$occupation,$id){
 	require "config.php";
 
 	try {
@@ -163,8 +165,8 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	else printok("Connecting to $db_hostname");
 
 	// min & max length input validation
-	$inputArray = array($email,$password,$firstname,$lastname,$dateofbirth,$contact,$department);
-	$inputNames = array('Email','Password','First Name','Last Name','Date Of Birth','Contact','Department');
+	$inputArray = array($email,$password,$firstname,$lastname,$dateofbirth,$contact,$department,$occupation);
+	$inputNames = array('Email','Password','First Name','Last Name','Date Of Birth','Contact','Department','Occupation');
 	for($counter = 0; $counter < count($inputArray); $counter++){
 		if($counter == 2 || $counter == 3){
 			if(strlen($inputArray[$counter]) > 20){
@@ -184,7 +186,7 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 				die();
 			}
 		}
-		elseif($counter == 6){
+		elseif($counter == 6 || $counter == 7){
 			if(strlen($inputArray[$counter]) > 20){
 				echo $inputNames[$counter]." is too long!<br>";
 				die();
@@ -214,6 +216,7 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	$checkall=$checkall && dateCheck($dateofbirth); 
 	$checkall=$checkall && inputChecker($contact,"/(6|8|9)\d{7}/"); //only allow singaporean phone number
 	$checkall=$checkall && inputChecker($department,"/^[A-Za-z\s]+$/"); //only allow letters
+	$checkall=$checkall && inputChecker($occupation,"/^[A-Za-z\s]+$/"); //only allow letters
 	if (!$checkall) {
 		echo "Error checking inputs<br>Please return to the registration form";
 		die();
@@ -229,10 +232,11 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	$sanitizedDateOfBirth = htmlspecialchars($dateofbirth);
 	$sanitizedContact = htmlspecialchars($contact);
 	$sanitizedDepartment = htmlspecialchars($department);
+	$sanitizedOccupation = htmlspecialchars($occupation);
 	//hashing password
 	$hashed_password = password_hash($sanitizedPassword,PASSWORD_DEFAULT);
-	$query=$con->prepare("UPDATE `users` SET `email`=?, `password`=?, `first_name`=?, `last_name`=?, `date_of_birth`=?, `contact`=?, `department`=? WHERE `ID` = ?");
-	$query->bind_param('sssssisi', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$id);
+	$query=$con->prepare("UPDATE `users` SET `email`=?, `password`=?, `first_name`=?, `last_name`=?, `date_of_birth`=?, `contact`=?, `department`=?, `occupation`=? WHERE `ID` = ?");
+	$query->bind_param('sssssissi', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$sanitizedOccupation,$id);
 	if($query->execute()){ //executing query (processes and print the results)
 		header("Location: http://localhost/SWAP-TP/userList.php");
 		die();
