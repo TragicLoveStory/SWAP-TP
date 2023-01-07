@@ -45,7 +45,7 @@
                 $department = $row['department'];
                 $timeOfSubmission = $row['timeOfSubmission'];
                 $status = $row['status'];
-                echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th><th><a href='authoriseLeave.php?leaveApproval=true&ALID=".$id."'>Approve</a></th><th><a href='authoriseLeave.php?leaveDeny=true&DLID=".$id."'>Deny</a></th></tr>";
+                echo "<tr><th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th><th><a href='authoriseLeave.php?leaveApproval=true&ALID=".$id."'>Approve</a></th><th><a href='authoriseLeave.php?leaveDeny=true&DLID=".$id."'>Deny</a></th></tr>";
             }
             echo "</table></div>";
             // loading of MC requests

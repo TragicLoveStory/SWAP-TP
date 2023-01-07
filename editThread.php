@@ -10,18 +10,26 @@
 <body>
     <?php 
         session_start();
+        require "config.php";
+        require "userfunctions.php";
         $uri = $_SERVER['REQUEST_URI'];
         $fullUri = "http://localhost${uri}";
         if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
             echo "Must be logged in.";
             die();
         }
-        require_once "config.php";
-        if(isset($_GET['editing']) && $_GET['editing']==="true"){
+        try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
-            if (!$con){
-                die('Could not connect: ' . mysqli_connect_errno()); 
             }
+            catch (Exception $e) {
+                printerror($e->getMessage(),$con);
+            }
+            if (!$con) {
+                printerror("Connecting to $db_hostname", $con);
+                die();
+            }
+            else printok("Connecting to $db_hostname");
+        if(isset($_GET['editing']) && $_GET['editing']==="true"){
             $query=$con->prepare("SELECT `title`,`content`,`userId` FROM `forum` WHERE `id` =?");
             $query->bind_param('i', $_GET['forumID']); //bind the parameters
             $query->execute();

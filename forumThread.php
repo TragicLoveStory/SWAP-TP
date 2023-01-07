@@ -62,6 +62,94 @@
             </tr>
         </table>
     <?php endif; ?>
+    <?php 
+    $uri = $_SERVER['REQUEST_URI'];
+    $fullUri = "http://localhost${uri}";
+    if($row['status'] === 1){
+        echo "<br><form action=".$fullUri." method='POST' style='text-align: center;'><input type='submit' value='Create Comment' name='commentSubmit'></form>";
+    }
+    else{
+        echo "<p style='text-align: center;'><b>This thread has since been archived. Thus, no further comments are able to be made.</b></p>";
+    }
+    echo "<p style='text-align: center;'><b>Comments:</b></p>";
+
+    $query2=$con->prepare("SELECT comments.ID, comments.userId, comments.forumId, comments.comment, comments.createOn,users.department, users.role FROM comments INNER JOIN users ON comments.userId = users.ID WHERE comments.forumId = ?"); 
+
+    $query2->bind_param('i',$_GET['forumID']);
+    if($query2->execute()){ //executing query (processes and print the results)
+        $result2 = $query2->get_result();
+        echo "<div><table align='center' border='1'><tr>";
+        echo"<th>ID</th><th>userId</th><th>forumId</th><th>comment</th><th>createOn</th><th>department</th><th>role</th><th>Rating</th></tr>";
+        while ($row2 = $result2->fetch_assoc()) {
+            $id = $row2['ID'];
+            $userId = $row2['userId'];
+            $forumId = $row2['forumId'];
+            $comment = $row2['comment'];
+            $createOn = $row2['createOn'];
+            $department = $row2['department'];
+            $role = $row2['role'];
+
+            $query3=$con->prepare("SELECT `id`,`commentId`,`userId`,`status` FROM `commentlikes` WHERE `commentId` = ?");
+            $query3->bind_param('i', $id); //bind the parameters
+            $query3->execute();
+            $result3 = $query3-> get_result();
+            $likeCounter = 0;
+            $likeStatus = "Like";
+            $dislikeStatus ="Dislike";
+            while($row3 = $result3 -> fetch_assoc()){
+                if($row3['status'] === 1){
+                    $likeCounter += 1;
+                }
+                else{
+                    $likeCounter -=1;
+                }
+                if($_SESSION['ID'] === $row3['userId']){
+                    if($row3['status'] === 1){
+                        $likeStatus = "Liked!";
+                        $dislikeStatus = "Dislike";
+                    }
+                    elseif($row3['status'] === 0){
+                        $likeStatus = "Like";
+                        $dislikeStatus = "Disliked!";
+                    }
+                    
+                }
+            }
+
+            if($_SESSION['ID'] === $row2['userId']){
+                echo "<tr><th>$id</th><th>$userId</th><th>$forumId</th><th>$comment</th><th>$createOn</th><th>$department</th><th>$role</th><th>$likeCounter</th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=l'>$likeStatus</a></th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=d'>$dislikeStatus</a></th><th><a href='forumThread.php?editingComment=true&commentID=".$id."'>Edit</a></th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&deletionComment=true&commentID=".$id."''>Delete</a></th></tr>";
+            }
+            else{  
+                echo "<tr><th>$id</th><th>$userId</th><th>$forumId</th><th>$comment</th><th>$createOn</th><th>$department</th><th>$role</th><th>$likeCounter</th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=l'>$likeStatus</a></th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=d'>$dislikeStatus</a></th></tr>";
+            }
+            
+        }
+    }
+
+    if(isset($_POST['commentSubmit']) && $_POST['commentSubmit']=== "Create Comment"){
+        $_SESSION['forumId'] = $_GET['forumID'];
+        header("Location: http://localhost/SWAP-TP/createComment.php");
+        die();
+    }
+
+    if (isset($_GET['editingComment']) && $_GET['editingComment'] === 'true') {
+        $_SESSION['commentId'] = $_GET['commentID'];
+        header("Location: http://localhost/SWAP-TP/editComment.php?editingComment=true");
+        die();
+    }
+
+    if (isset($_GET['deletionComment']) && $_GET['deletionComment'] === 'true') {
+        deleteComment();
+    }
+    if (isset($_GET['lc'])) {
+        if($_GET['lc'] === 'l'){
+            likeComment();
+        }
+        elseif($_GET['lc'] === 'd'){
+            dislikeComment();
+        }
+    }
+    ?>
     <style>
         .Content{
             max-width: 300px;

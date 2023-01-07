@@ -12,8 +12,6 @@
         session_start();
         require "config.php";
         require "userfunctions.php";
-        $uri = $_SERVER['REQUEST_URI'];
-        $fullUri = "http://localhost${uri}";
         if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
             echo "Must be logged in.";
             die();
@@ -29,44 +27,44 @@
                 die();
             }
             else printok("Connecting to $db_hostname");
-        if(isset($_GET['editing']) && $_GET['editing']==="true"){
-            $query=$con->prepare("SELECT `safetyTitle`,`safetyContent`,`videoLink`FROM `workplacesafety` WHERE `id` =?");
-            $query->bind_param('i', $_GET['safetyID']); //bind the parameters
+        if(isset($_SESSION['commentId'])){
+            $query=$con->prepare("SELECT `userId`, `forumId`, `comment` FROM `comments` WHERE `ID` = ?");
+            $query->bind_param('i',$_SESSION['commentId']); //bind the parameters
             $query->execute();
             $result = $query-> get_result();
             $row = $result -> fetch_assoc();
-        }  
-        if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Safety Thread"){
-            if(!empty($_POST['video']) && !empty($_POST['content']) && !empty($_POST['title'])){
-                require_once "safetyFunctions.php";
-                editSafetyThread($_POST['title'],$_POST['content'],$_POST['video'],$_GET['safetyID']);
+        } 
+        else{
+            echo "FORBIDDEN.";
+            die();
+        } 
+        if($_SESSION['ID'] !== $row['userId']){
+            echo "Access forbidden. Unable to edit other user's threads";
+            die();
+        }
+        if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Comment"){
+            if(!empty($_POST['comment'])){
+                require_once "forumFunctions.php";
+                editComment($_POST['comment'],$_SESSION['commentId'],$row['forumId']);
             }
             else{
                 echo "Error: No fields should be empty<br>";
             }
-        }
+        }   
     ?>
-    <form action="<?= $fullUri ?>" method='post'>
+    <form action="editComment.php?editingComment=true" method='post'>
     <table style='text-align: left; margin-left: auto; margin-right: auto;'>
     <tr>
         <th></th>
-        <th style='text-align: center;'>Edit Safety Thread</th>
+        <th style='text-align: center;'>Edit Comment</th>
     </tr>
     <tr>
-        <td><label for='title'>Title:</label></td>
-        <td><input type='text' name='title' style="width: 375px;" value="<?= $row['safetyTitle']; ?>"><br></td>
-    </tr>
-    <tr>
-        <td><label for='content'>Content:</label></td>
-        <td><textarea name="content" rows="8" cols="50" style="resize:none; white-space: pre-wrap;"><?= $row['safetyContent']; ?></textarea><br></td>
-    </tr>
-    <tr>
-        <td><label for='video'>Video Link:</label></td>
-        <td><input type='text' name='video' style="width: 375px;" value="<?= $row['videoLink']; ?>"><br></td>
+        <td><label for='comment'>Comment:</label></td>
+        <td><textarea name="comment" rows="8" cols="50" style="resize:none"><?= $row['comment'] ?></textarea><br></td>
     </tr>
     <tr>
         <td></td>
-        <td style='text-align: right;'><input type='submit' value='Edit Safety Thread' name='Submit'></td>
+        <td style='text-align: right;'><input type='submit' value='Edit Comment' name='Submit'></td>
     </tr>  
     </table>
     </form>

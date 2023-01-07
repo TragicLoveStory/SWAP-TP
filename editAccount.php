@@ -10,21 +10,29 @@
 <body>
 <?php 
         session_start();
+        require "config.php";
+        require "userfunctions.php";
         if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="USER-ADMIN"){
             echo "Only permitted for User Admins.";
             die();
         } 
-
+        try {
+            $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+            }
+            catch (Exception $e) {
+                printerror($e->getMessage(),$con);
+            }
+            if (!$con) {
+                printerror("Connecting to $db_hostname", $con);
+                die();
+            }
+            else printok("Connecting to $db_hostname");
         $uri = $_SERVER['REQUEST_URI'];
         $fullUri = "http://localhost${uri}";
         require_once "userFunctions.php";
         require_once "config.php";
 
         if(isset($_GET['editing']) && $_GET['editing']==="true"){
-            $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
-            if (!$con){
-                die('Could not connect: ' . mysqli_connect_errno()); 
-            }
             $userID= $_GET['TheUserId'];
             $query=$con->prepare("SELECT * FROM `users` WHERE `ID` =?");
             $query->bind_param('i', $userID); //bind the parameters

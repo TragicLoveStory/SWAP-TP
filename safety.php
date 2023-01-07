@@ -45,7 +45,6 @@
         }
 }
     elseif (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] !== "FORUM-ADMIN"){
-        echo '<form action="createSafety.php" method="POST"><input type="submit" value="Create new Workplace Safety Thread"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -67,7 +66,7 @@
             "<th>id</th><th>safetyTitle</th><th>safetyContent</th><th>videoLink</th><th>createOn</th><th>lastEdited</th></tr>";
             while($query->fetch())
             {
-                echo "<tr><th>$id</th><th>$safetyTitle</th><th>$safetyContent</th><th>$videoLink</th><th>$createOn</th><th>$lastEdited</th></tr>";
+                echo "<tr><th>$id</th><th><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></th><th>$safetyContent</th><th>$videoLink</th><th>$createOn</th><th>$lastEdited</th>";
             }
             echo "</table>";
     }

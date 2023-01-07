@@ -31,7 +31,6 @@ function createSafetyThread($title,$content,$videoLink){
 //edit safety forum threads
 function editSafetyThread($title,$content,$videoLink,$safetyID){
     require "config.php";
-    require "userFunctions.php";
 	try {
 	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
 	}

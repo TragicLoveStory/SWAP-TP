@@ -35,7 +35,7 @@
         "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th></tr>";
         while($query->fetch())
         {
-            echo "<th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$occupation</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&TheUserId=".$id."'>delete</a></th></tr>";
+            echo "<tr><th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$occupation</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&TheUserId=".$id."'>delete</a></th></tr>";
         }
         echo "</table>";
 

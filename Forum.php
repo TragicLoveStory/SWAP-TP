@@ -15,7 +15,9 @@
     require "forumFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] !== "FORUM-ADMIN"){
-        echo '<form action="createThread.php" method="POST"><input type="submit" value="Create a forum post"></form>';
+        $uri = $_SERVER['REQUEST_URI'];
+        $fullUri = "http://localhost${uri}";
+        echo '<form action='.$fullUri.' method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -40,9 +42,16 @@
                 echo "<tr><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$lastEdited</th><th>$viewCount</th></tr>";
             }
             echo "</table>";
+
+        if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
+            header("Location: http://localhost/SWAP-TP/createThread.php");
+            die();
+        }
     }
     elseif(isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "FORUM-ADMIN"){
-        echo '<form action="createThread.php" method="POST"><input type="submit" value="Create a forum post"></form>';
+        $uri = $_SERVER['REQUEST_URI'];
+        $fullUri = "http://localhost${uri}";
+        echo '<form action='.$fullUri.' method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -78,6 +87,10 @@
         }
         if (isset($_GET['Archive']) && $_GET['Archive'] === 'true') {
             archiveThread();
+        }
+        if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
+            header("Location: http://localhost/SWAP-TP/createThread.php");
+            die();
         }
     }
     else{

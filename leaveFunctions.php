@@ -400,6 +400,5 @@ function editLeave($days,$reason){
         printerror("Selecting $db_database",$con);
     }
 }
-// LEFT WITH EDIT LEAVE REQUESTS
 // UPDATE ATTENDANCE TABLE WHEN MC/LEAVE IS PERMITTED OR DENIED (ADVANCED)
 ?>
