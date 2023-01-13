@@ -34,10 +34,6 @@ function dateCheck($dateOfBirth){
 	
 }
 
-// function dateTimeCheck(){
-// 	echo "To be done.";
-// }
-
 function inputChecker($input,$regexPattern){
 	if(empty($input)){
 		return false;
@@ -112,7 +108,7 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	// regular expressions + date checking
 	$checkall = true;
 	$checkall=$checkall && inputChecker($email,"/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i");
-	$checkall=$checkall && inputChecker($password,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s] || .*[_])).{10,29}$/"); //must have lower case, upper case, special char and number
+	$checkall=$checkall && inputChecker($password,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s]|.*[_])).{10,29}$/"); //must have lower case, upper case, special char and number
 	$checkall=$checkall && inputChecker($firstname,"/^[A-Za-z\s]+$/"); //only allow letters
 	$checkall=$checkall && inputChecker($lastname,"/^[A-Za-z\s]+$/"); //only allow letters
 	$checkall=$checkall && dateCheck($dateofbirth); 
@@ -210,7 +206,7 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	// regular expressions + date checking
 	$checkall = true;
 	$checkall=$checkall && inputChecker($email,"/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i");
-	$checkall=$checkall && inputChecker($password,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s] || .*[_])).{10,29}$/"); //must have lower case, upper case, special char and number
+	$checkall=$checkall && inputChecker($password,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s]|.*[_])).{10,29}$/"); //must have lower case, upper case, special char and number
 	$checkall=$checkall && inputChecker($firstname,"/^[A-Za-z\s]+$/"); //only allow letters
 	$checkall=$checkall && inputChecker($lastname,"/^[A-Za-z\s]+$/"); //only allow letters
 	$checkall=$checkall && dateCheck($dateofbirth); 

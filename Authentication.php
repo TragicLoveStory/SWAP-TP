@@ -89,7 +89,8 @@ function login($email,$password){
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();
         $row = $result->fetch_assoc();
-        if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || !password_verify($password,$row['password'])){
+		//htmlspecialchars the password input as we sanitized the password input before INSERT into database.
+        if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || !password_verify($password,htmlspecialchars($row['password']))){
             printerror("Wrong Login Credentials",$con);
         }
         else{
@@ -114,7 +115,8 @@ function login($email,$password){
 				session_start(); //start a NEW session
 				session_regenerate_id(); //regenerate a new session ID because old one was destroyed
 				printok("Started session"); //creates/resumes session
-				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
+				$_SESSION["ID"]=$row['ID'];
+				$_SESSION['email'] = $row['email']; 
 				$_SESSION["role"]=$row['role'];
 				$_SESSION["occupation"]=$row['occupation'];
 				$_SESSION["department"]=$row['department'];
@@ -132,7 +134,8 @@ function login($email,$password){
 			else{
 				//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
 				printok("Started session"); //creates/resumes session
-				$_SESSION["ID"]=$row['ID']; //adds email variable into session (form of keypair/hash map)
+				$_SESSION["ID"]=$row['ID']; 
+				$_SESSION['email'] = $row['email']; 
 				$_SESSION["role"]=$row['role'];
 				$_SESSION["occupation"]=$row['occupation'];
 				$_SESSION["department"]=$row['department'];

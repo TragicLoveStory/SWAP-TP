@@ -33,15 +33,26 @@
     $query->execute();
     $result = $query-> get_result();
     $row = $result -> fetch_assoc();
+    if(!$row){
+        echo "access forbidden";
+        die();
+    }
     $uri = $_SERVER['REQUEST_URI'];
     $fullUri = "http://localhost${uri}";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Work Leave"){
-        editLeave($_POST['editLeave'],$_POST['reasonForLeave']);
+        if(!empty($_POST['editLeave']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_POST['reasonForLeave'])){
+            editLeave($_POST['editLeave'],$_POST['startDate'],$_POST['endDate'],$_POST['reasonForLeave']);
+        }
+        
     }
     ?>
     <form action="<?= $fullUri ?>" method="post" style="text-align: center;">
         <label for='editLeave'>Number of days for work leave:</label>
         <input type="number" id="editLeave" name="editLeave" min="1" max="60" value="<?= $row['Days'] ?>"><br>
+        <label for='startDate'>Start Date</label>
+        <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+        <label for='endDate'>End Date</label>
+        <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
         <label for='reasonForLeave'>Reason for work leave:</label>
         <input type="text" id="reasonForLeave" name="reasonForLeave" value="<?= $row['Reason'] ?>"><br>
         <input type="submit" value="Edit Work Leave" name="Submit">

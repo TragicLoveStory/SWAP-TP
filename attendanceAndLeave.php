@@ -50,52 +50,56 @@
     $percentage = round(($counter / $days) * 100,2);
     echo "<p style='text-align: center;'>Attendance: ".$counter."/".$days." (".$percentage."%)"."</p>";
 
-    $query2=$con->prepare("SELECT `id`,`userId`,`Days`,`Reason`,`department`,`timeOfSubmission`,`status` FROM workleave WHERE userId = ?");
+    $query2=$con->prepare("SELECT `id`,`userId`,`Days`,`startDate`,`endDate`,`Reason`,`department`,`timeOfSubmission`,`status` FROM workleave WHERE userId = ?");
     $query2->bind_param('i', $_SESSION['ID']); //bind the parameters
     $query2->execute();
     $result2 = $query2-> get_result();
     echo "<div id='toggle1'><p style='text-align: center;'>Leave Requests:</p><table align='center' border='1'><tr>";
     echo
-    "<th>id</th><th>userId</th><th>Days</th><th>Reason</th><th>Department</th><th>timeOfSubmission</th><th>status</th></tr>";
-    while($row = $result2 -> fetch_assoc()){
-        $id = $row['id'];
-        $userId = $row['userId'];
-        $Days = $row['Days'];
-        $Reason = $row['Reason'];
-        $department = $row['department'];
-        $timeOfSubmission = $row['timeOfSubmission'];
-        $status = $row['status'];
+    "<th>id</th><th>userId</th><th>Days</th><th>startDate</th><th>endDate</th><th>Reason</th><th>Department</th><th>timeOfSubmission</th><th>status</th></tr>";
+    while($row2 = $result2 -> fetch_assoc()){
+        $id = $row2['id'];
+        $userId = $row2['userId'];
+        $Days = $row2['Days'];
+        $startDate = $row2['startDate'];
+        $endDate = $row2['endDate'];
+        $Reason = $row2['Reason'];
+        $department = $row2['department'];
+        $timeOfSubmission = $row2['timeOfSubmission'];
+        $status = $row2['status'];
         if($status === -1){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th><th><a href='editLeave.php?leaveEditing=true&LEID=".$id."'>Edit</a></th><th><a href='attendanceAndLeave.php?leaveDeleting=true&LDID=".$id."'>Delete</a></th></tr>";
+            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th><th><a href='editLeave.php?leaveEditing=true&LEID=".$id."'>Edit</a></th><th><a href='attendanceAndLeave.php?leaveDeleting=true&LDID=".$id."'>Delete</a></th></tr>";
         }
         elseif($status === 1 || $status === 0){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th></tr>";
+            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th></tr>";
         }
         
 
     }
     echo "</table></div>";
 
-    $query3=$con->prepare("SELECT `id`,`userId`,`mcFile`,`Days`,`department`,`timeOfSubmission`,`status` FROM medicalcertificate WHERE userId = ?");
+    $query3=$con->prepare("SELECT `id`,`userId`,`mcFile`,`Days`,`startDate`,`endDate`,`department`,`timeOfSubmission`,`status` FROM medicalcertificate WHERE userId = ?");
     $query3->bind_param('i',$_SESSION['ID']);
     $query3->execute();
     $result3 = $query3-> get_result();
     echo "<div id='toggle2'><p style='text-align: center;'>MC Requests:</p><table align='center' border='1'><tr>";
     echo
-    "<th>id</th><th>userId</th><th>mcFile</th><th>Days</th><th>Department</th><th>timeOfSubmission</th><th>status</th></tr>";
-    while ($row = $result3->fetch_assoc()) {
-        $id2 = $row['id'];
-        $userId2 = $row['userId'];
-        $mcFile2 = $row['mcFile'];
-        $Days2 = $row['Days'];
-        $department2 = $row['department'];
-        $timeOfSubmission2 = $row['timeOfSubmission'];
-        $status2 = $row['status'];
+    "<th>id</th><th>userId</th><th>mcFile</th><th>Days</th><th>startDate</th><th>endDate</th><th>Department</th><th>timeOfSubmission</th><th>status</th></tr>";
+    while ($row3 = $result3->fetch_assoc()) {
+        $id2 = $row3['id'];
+        $userId2 = $row3['userId'];
+        $mcFile2 = $row3['mcFile'];
+        $Days2 = $row3['Days'];
+        $startDate2 = $row3['startDate'];
+        $endDate2 = $row3['endDate'];
+        $department2 = $row3['department'];
+        $timeOfSubmission2 = $row3['timeOfSubmission'];
+        $status2 = $row3['status'];
         if($status2 === -1){
-            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th><th><a href='editMc.php?mcEID=".$id2."'>Edit</a></th><th><a href='attendanceAndLeave.php?mcDeleting=true&MCDID=".$id2."'>Delete</a></th></th></tr>";
+            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th><th><a href='editMc.php?mcEID=".$id2."'>Edit</a></th><th><a href='attendanceAndLeave.php?mcDeleting=true&MCDID=".$id2."'>Delete</a></th></th></tr>";
         }
         elseif($status2 === 0 || $status2 === 1){
-            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th></tr>";
+            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th></tr>";
         }
         
     }
@@ -113,8 +117,6 @@
     if (isset($_GET['mcDeleting']) && $_GET['mcDeleting'] === 'true') {
         deleteMcRequest();
     }
-    //*list all leave requests and medical certificates uploaded*
-    //*ALLOW user to edit or delete PENDING leave/MC requests*
 
     ?>
     <!-- <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">

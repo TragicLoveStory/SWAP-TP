@@ -22,12 +22,18 @@
             echo "File size is too large.";
             die();
         }
-        submitMC($_POST['mcDays']);
+        if(!empty($_POST['mcDays']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_FILES['uploadMC'])){
+            submitMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
+        }
     }
     ?>
     <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">
         <label for='mcDays'>Number of days for work leave:</label>
         <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
+        <label for='startDate'>Start Date</label>
+        <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+        <label for='endDate'>End Date</label>
+        <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
         <label for='uploadMC'>Upload MC:</label>
         <input type="file" name="uploadMC">
         <input type="submit" value="Upload MC" name="Submit">

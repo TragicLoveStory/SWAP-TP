@@ -17,12 +17,18 @@
     }  
 
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Submit Work Leave"){
-        submitLeave($_POST['submitLeave'],$_POST['reasonForLeave']);
+        if(!empty($_POST['submitLeave']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_POST['reasonForLeave'])){
+            submitLeave($_POST['submitLeave'],$_POST['startDate'],$_POST['endDate'],$_POST['reasonForLeave']);
+        }  
     }
     ?>
     <form action="submitLeave.php" method="post" style="text-align: center;">
         <label for='submitLeave'>Number of days for work leave:</label>
         <input type="number" id="submitLeave" name="submitLeave" min="1" max="60"><br>
+        <label for='startDate'>Start Date</label>
+        <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+        <label for='endDate'>End Date</label>
+        <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
         <label for='reasonForLeave'>Reason for work leave:</label>
         <input type="text" id="reasonForLeave" name="reasonForLeave"><br>
         <input type="submit" value="Submit Work Leave" name="Submit">
