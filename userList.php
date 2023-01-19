@@ -29,7 +29,7 @@
         // loading of user details
         $query=$con->prepare("select * from users");
         $query->execute();
-        $query->bind_result($id, $email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$occupation, $role, $status);
+        $query->bind_result($id, $email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$occupation, $role, $status, $aboutMe, $profilePic);
         echo "<table align='center' border='1'><tr>";
         echo
         "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th></tr>";

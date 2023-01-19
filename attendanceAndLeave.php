@@ -105,14 +105,8 @@
     }
     echo "</table></div>";
 
-    if (isset($_GET['leaveEditing']) && $_GET['leaveEditing'] === 'true') {
-        editLeaveRequest();
-    }
     if (isset($_GET['leaveDeleting']) && $_GET['leaveDeleting'] === 'true') {
         deleteLeaveRequest();
-    }
-    if (isset($_GET['mcEditing']) && $_GET['mcEditing'] === 'true') {
-        editMcRequest();
     }
     if (isset($_GET['mcDeleting']) && $_GET['mcDeleting'] === 'true') {
         deleteMcRequest();

@@ -272,4 +272,67 @@ function deleteItem() {
 	}
 }
 
+function editProfile($firstName,$lastName,$contactNumber,$aboutMe){
+	require "config.php";
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+
+	// min & max length input validation
+	$inputArray = array($firstName,$lastName,$contactNumber,$aboutMe);
+	$inputNames = array('First Name','Last Name','Contact','About Me');
+	for($counter = 0; $counter < count($inputArray); $counter++){
+		if($counter == 0 || $counter == 1){
+			if(strlen($inputArray[$counter]) > 20){
+				echo $inputNames[$counter]." is too long!";
+				die();
+			}
+		}
+		elseif($counter == 2){
+			if(strlen($inputArray[$counter]) !== 8){
+				echo $inputNames[$counter]." number is incorrect!<br>";
+				die();
+			}
+		}
+		elseif($counter == 3){
+			if(strlen($inputArray[$counter]) > 500){
+				echo $inputNames[$counter]." is too long!<br>";
+				die();
+			}
+		}
+	}
+
+	// regular expressions + date checking
+	$checkall = true;
+	$checkall=$checkall && inputChecker($firstName,"/^[A-Za-z\s]+$/"); //only allow letters
+	$checkall=$checkall && inputChecker($lastName,"/^[A-Za-z\s]+$/"); //only allow letters
+	$checkall=$checkall && inputChecker($contactNumber,"/(6|8|9)\d{7}/"); //only allow singaporean phone number
+	if (!$checkall) {
+		echo "Error checking inputs<br>Please return to the registration form";
+		die();
+	}
+	// htmlspecialchars  (defence against XSS)
+	$sanitizedFirstName = htmlspecialchars($firstName);
+	$sanitizedLastName = htmlspecialchars($lastName);
+	$sanitizedContact = htmlspecialchars($contactNumber);
+	$sanitizedAboutMe = htmlspecialchars($aboutMe);
+	$query=$con->prepare("UPDATE `users` SET `first_name`=?, `last_name`=?, `contact`=?, `aboutMe`=? WHERE `ID` = ?");
+	$query->bind_param('ssisi', $sanitizedFirstName, $sanitizedLastName, $sanitizedContact, $sanitizedAboutMe, $_SESSION['ID']);
+	if($query->execute()){ //executing query (processes and print the results)
+		header("Location: http://localhost/SWAP-TP/profile.php");
+		die();
+	}
+	else{
+		printerror("Selecting $db_database",$con);
+	}
+}
+
 ?>
