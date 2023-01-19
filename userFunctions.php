@@ -286,6 +286,49 @@ function editProfile($firstName,$lastName,$contactNumber,$aboutMe){
 	}
 	else printok("Connecting to $db_hostname");
 
+	//check if new profile pic was uploaded
+	if ($_FILES['uploadPic']['size'] != 0 || $_FILES['uploadPic']['error'] != 4 || is_uploaded_file($_FILES['uploadPic']['name'])){
+		//change uploaded file's name to remove user-controlled factor
+		$target_dir = "profilePic/";
+		$filename = basename($_FILES["uploadPic"]["name"]);
+		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION)); 
+		$target_file = $target_dir . time() . "." . $ext;
+		//input validation 1) file type validation.
+		$allowed = array('png', 'jpg', 'jpeg','pdf');
+		if (in_array($ext, $allowed)) {
+			//input validation 2) check file size
+			if ($_FILES["uploadPic"]["size"] > 1000000) {
+				echo "File size is too large.";
+				die();
+			}
+			//input validation 3) check if file exists
+			if(file_exists($target_file)){
+				echo "File already exists.";
+				die();
+			}
+			// check if file was uploaded successfully
+			if(!move_uploaded_file($_FILES["uploadPic"]["tmp_name"], $target_file)){
+				echo "Sorry, an error occurred when uploading the file.";
+				die();
+			}
+			else{
+				$query=$con->prepare("UPDATE `users` SET `profilePic` = ? WHERE `ID` = ?");
+				$query->bind_param('si', $target_file,$_SESSION['ID']);
+				if($query->execute()){ //executing query (processes and print the results)
+					printok("Successfully Uploaded."); 
+				}
+				else{
+					printerror("Selecting $db_database",$con);
+				}
+			}
+			
+		}
+		else{
+			echo "Error: only JPG, JPEG, PNG & PDF files are allowed.";
+			die();
+		}
+	}
+
 	// min & max length input validation
 	$inputArray = array($firstName,$lastName,$contactNumber,$aboutMe);
 	$inputNames = array('First Name','Last Name','Contact','About Me');
@@ -335,4 +378,33 @@ function editProfile($firstName,$lastName,$contactNumber,$aboutMe){
 	}
 }
 
+function enableOTP(){
+	require "config.php";
+	require "Authentication.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+
+	$otpStatus = 1;
+	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
+	$query->bind_param('ii', $otpStatus, $_SESSION['ID']); //bind the parameters
+	if($query->execute()){ //executing query (processes and print the results)
+		logout();
+	}
+	else{
+		echo "Error Executing Query";
+	}
+}
+
+function disableOTP(){
+
+}
 ?>

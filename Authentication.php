@@ -71,7 +71,7 @@ function attendanceCheck($ID){
 function login($email,$password){
     require "config.php";
     require "userFunctions.php";
-
+	date_default_timezone_set('Singapore');
 	try {
 	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
 	}
@@ -84,7 +84,7 @@ function login($email,$password){
 	}
 	else printok("Connecting to $db_hostname");
 
-    $query=$con->prepare("SELECT `ID`,`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`,`role`,`status` from users WHERE `email`=?");
+    $query=$con->prepare("SELECT * from users WHERE `email`=?");
     $query->bind_param('s',$email);
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();
@@ -94,8 +94,24 @@ function login($email,$password){
             printerror("Wrong Login Credentials",$con);
         }
         else{
+			if($row['otp'] == 1){
+				$key = "82734ywehfgagjlwenfgwuipth2498579efgo29835yrehgjkreng";
+				$initializationIV = "";
+				$AES128_ECB="aes-128-ecb";
+				$encryptedValue = openssl_encrypt($email, $AES128_ECB, $key, $options=0, $initializationIV);
+				// 30 minute cookie for otp
+				setcookie("nezha", $encryptedValue, [
+					'expires' => time() + 1800,
+					'path' => '/SWAP-TP',
+					'domain' => '',
+					'secure' => TRUE,
+					'httponly' => TRUE,
+					'samesite' => 'Strict'
+				]);
+				include "mailFunctions.php";
+				sendOTP($email);
+			}
 			attendanceCheck($row['ID']);
-
             printok("Login Successful");
 			session_set_cookie_params([
 				'lifetime' => '86400',
@@ -122,14 +138,14 @@ function login($email,$password){
 				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
 				printok("Added ID & role into _SESSION"); //acknowledgement
-				setcookie("Department", $row['department'], [
-					'expires' => time() + 86400,
-					'path' => '/SWAP-TP',
-					'domain' => '',
-					'secure' => TRUE,
-					'httponly' => TRUE,
-					'samesite' => 'Strict'
-				]);
+				// setcookie("Department", $row['department'], [
+				// 	'expires' => time() + 86400,
+				// 	'path' => '/SWAP-TP',
+				// 	'domain' => '',
+				// 	'secure' => TRUE,
+				// 	'httponly' => TRUE,
+				// 	'samesite' => 'Strict'
+				// ]);
 			}
 			else{
 				//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
@@ -142,20 +158,21 @@ function login($email,$password){
 				$_SESSION["status"]=$row['status'];
 				printok("Added ID & role into _SESSION"); //acknowledgement
 				//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
-				setcookie("Department", $row['department'], [
-					'expires' => time() + 86400,
-					'path' => '/SWAP-TP',
-					'domain' => '',
-					'secure' => TRUE,
-					'httponly' => TRUE,
-					'samesite' => 'Strict'
-				]);
-				// header("Location: http://localhost/SWAP-TP/foo.php");
-				// die();
-				//debug();
+				// setcookie("Department", $row['department'], [
+				// 	'expires' => time() + 86400,
+				// 	'path' => '/SWAP-TP',
+				// 	'domain' => '',
+				// 	'secure' => TRUE,
+				// 	'httponly' => TRUE,
+				// 	'samesite' => 'Strict'
+				// ]);
 			}
 			if($_SESSION['status'] === -1){
 				header("Location: http://localhost/SWAP-TP/firstPassChange.php");
+				die();
+			}
+			else{
+				header("Location: http://localhost/SWAP-TP/index.php");
 				die();
 			}
         }
@@ -233,6 +250,124 @@ function firstPasswordChange($passwordInput,$confirmPasswordInput){
 		printok("Closing connection");
 		echo "Logging Out. Log back in.";
 		logout();
+	}
+	else{
+		printerror("Selecting $db_database",$con);
+	}
+}
+
+function otpLogin($inputOTP){
+	require "config.php";
+    require "userFunctions.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
+
+	// decryption of cookie containing email input
+	$key = "82734ywehfgagjlwenfgwuipth2498579efgo29835yrehgjkreng";
+	$initializationIV = "";
+	$AES128_ECB="aes-128-ecb";
+	$decryptedvalue = openssl_decrypt($_COOKIE['nezha'], $AES128_ECB, $key, $options=0, $initializationIV);
+	//decryption of cookie value containing OTP input
+	$key2 = "erioepb834759-0324523u45htyiow45hjiopwjh-90et0-239456";
+    $initializationIV2 = "";
+    $AES128_ECB2="aes-128-ecb";
+    $decryptedvalue2 = openssl_decrypt($_COOKIE['nali'], $AES128_ECB2, $key2, $options=0, $initializationIV2);
+
+	if(!isset($_COOKIE['nezha']) || !isset($_COOKIE['nali']) || $decryptedvalue2 != $inputOTP){
+		echo "Incorrect OTP";
+		die();
+	}
+	foreach ($_COOKIE as $key=>$value) {
+		foreach($_COOKIE as $key=>$value){
+			echo "Clearing: $key $value<br>";
+			setcookie($key, "", time()-1*60*60, "/SWAP-TP"); // path needs to match the initial setcookie() call
+		}
+	}
+    $query=$con->prepare("SELECT * from users WHERE `email`=?");
+    $query->bind_param('s',$decryptedvalue);
+    if($query->execute()){ //executing query (processes and print the results)
+        $result = $query->get_result();
+        $row = $result->fetch_assoc();
+		//htmlspecialchars the password input as we sanitized the password input before INSERT into database.
+        if(empty($row['email']) || $row['email'] !== $decryptedvalue){
+            printerror("Wrong Login Credentials",$con);
+        }
+        else{
+			attendanceCheck($row['ID']);
+            printok("Login Successful");
+			session_set_cookie_params([
+				'lifetime' => '86400',
+				'path' => '/SWAP-TP',
+				'domain' => '',
+				'secure' => TRUE,
+				'httponly' => TRUE,
+				'samesite' => 'Strict'
+			]);
+			session_start();
+			if(isset($_COOKIE['PHPSESSID'])){
+				echo $_COOKIE['PHPSESSID']."<br>Redundant cookie named PHPSESSID containing session ID to be removed.";
+				setcookie('PHPSESSID', "", time()-1*60*60, "/");
+				session_unset(); // remove/unset/free all session variables
+				session_destroy(); //destroy the session 
+
+				session_start(); //start a NEW session
+				session_regenerate_id(); //regenerate a new session ID because old one was destroyed
+				printok("Started session"); //creates/resumes session
+				$_SESSION["ID"]=$row['ID'];
+				$_SESSION['email'] = $row['email']; 
+				$_SESSION["role"]=$row['role'];
+				$_SESSION["occupation"]=$row['occupation'];
+				$_SESSION["department"]=$row['department'];
+				$_SESSION["status"]=$row['status'];
+				printok("Added ID & role into _SESSION"); //acknowledgement
+				// setcookie("Department", $row['department'], [
+				// 	'expires' => time() + 86400,
+				// 	'path' => '/SWAP-TP',
+				// 	'domain' => '',
+				// 	'secure' => TRUE,
+				// 	'httponly' => TRUE,
+				// 	'samesite' => 'Strict'
+				// ]);
+			}
+			else{
+				//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
+				printok("Started session"); //creates/resumes session
+				$_SESSION["ID"]=$row['ID']; 
+				$_SESSION['email'] = $row['email']; 
+				$_SESSION["role"]=$row['role'];
+				$_SESSION["occupation"]=$row['occupation'];
+				$_SESSION["department"]=$row['department'];
+				$_SESSION["status"]=$row['status'];
+				printok("Added ID & role into _SESSION"); //acknowledgement
+				//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
+				// setcookie("Department", $row['department'], [
+				// 	'expires' => time() + 86400,
+				// 	'path' => '/SWAP-TP',
+				// 	'domain' => '',
+				// 	'secure' => TRUE,
+				// 	'httponly' => TRUE,
+				// 	'samesite' => 'Strict'
+				// ]);
+			}
+			if($_SESSION['status'] === -1){
+				header("Location: http://localhost/SWAP-TP/firstPassChange.php");
+				die();
+			}
+			else{
+				header("Location: http://localhost/SWAP-TP/index.php");
+				die();
+			}
+        }
 	}
 	else{
 		printerror("Selecting $db_database",$con);

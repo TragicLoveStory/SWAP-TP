@@ -58,6 +58,16 @@ function generateRandomString($length = 10) {
     return $randomString;
 }
 
+function generateOTP() {
+    $characters = '1357902468';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < 6; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
 function resetPassword($randomString,$newPassword){
     require "config.php";
     require "userFunctions.php";
@@ -115,5 +125,33 @@ function resetPassword($randomString,$newPassword){
         }
     }
 
+}
+
+function sendOTP($email){
+    date_default_timezone_set('Singapore');
+    $generatedOTP = generateOTP();
+    $receiver = $email;
+    $subject = "OTP";
+    $body = "Hello ".$email.", as OTP is enabled for your TPAMC account, we have sent an OTP for your recent login attempt below.\r\n".$generatedOTP;
+    $sender = "From:parcelofjoy@gmail.com";
+    if(mail($receiver, $subject, $body, $sender)){
+        echo "Email sent successfully to $receiver";
+        $key = "erioepb834759-0324523u45htyiow45hjiopwjh-90et0-239456";
+        $initializationIV = "";
+        $AES128_ECB="aes-128-ecb";
+        $encryptedValue = openssl_encrypt($generatedOTP, $AES128_ECB, $key, $options=0, $initializationIV);
+        setcookie("nali", $encryptedValue, [
+            'expires' => time() + 1800,
+            'path' => '/SWAP-TP',
+            'domain' => '',
+            'secure' => TRUE,
+            'httponly' => TRUE,
+            'samesite' => 'Strict'
+        ]);
+        header("Location: http://localhost/SWAP-TP/otp.php");
+        die();
+    }else{
+        echo "Sorry, failed while sending mail!";
+    }
 }
 ?>

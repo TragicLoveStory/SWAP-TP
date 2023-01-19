@@ -49,8 +49,9 @@
         }
     ?>
     <div class="container" style="display: flex; flex-direction: column; align-items:center;">
-        <img src="<?= $row['profilePic'] ?>" alt="Profile Picture" style="object-fit: cover; width: 150px; height: 150px; border-radius: 50%; border: 1.5px solid #656065;">
-        <form action="editProfile.php" method="POST" style="text-align: center;">
+        <form action="editProfile.php" method="POST" enctype="multipart/form-data" style="text-align: center;">
+            <img src="<?= $row['profilePic'] ?>" alt="Profile Picture" style="object-fit: cover; width: 150px; height: 150px; border-radius: 50%; border: 1.5px solid #656065;"><br>
+            <input type="file" name="uploadPic"><br>
             <label for='firstName'>First name:</label><br>
             <input type='text' name='firstName' value= '<?= $row['first_name'] ?>'><br>
             <label for='lastName'>Last name:</label><br>

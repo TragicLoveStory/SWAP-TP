@@ -31,6 +31,14 @@ function submitMC($days,$startDate,$endDate){
         echo "Incorrect number of days requested.";
         die();
     }
+    //check if file was uploaded
+    if ($_FILES['uploadMC']['size'] != 0 || $_FILES['uploadMC']['error'] != 4 || is_uploaded_file($_FILES['uploadMC']['name'])){
+
+    }
+    else{
+        echo "File not uploaded.";
+        die();
+    }
     //input validation 1) file type validation.
     $allowed = array('png', 'jpg', 'jpeg','pdf');
     if (in_array($ext, $allowed)) {
@@ -420,6 +428,14 @@ function editMC($days,$startDate,$endDate){
     // validate number of days requested
     if($days > 60 || $days < 1){
         echo "Incorrect number of days requested.";
+        die();
+    }
+    //check if file was uploaded
+    if ($_FILES['editMC']['size'] != 0 || $_FILES['editMC']['error'] != 4 || is_uploaded_file($_FILES['editMC']['name'])){
+
+    }
+    else{
+        echo "File not uploaded.";
         die();
     }
     //input validation 1) file type validation.
