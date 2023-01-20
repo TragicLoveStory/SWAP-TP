@@ -22,14 +22,13 @@ function createSafetyThread($title,$content,$videoLink){
 	if($query->execute()){ //executing query (processes and print the results)
 		header("Location: http://localhost/SWAP-TP/Safety.php");
 		die();
-		printok("Closing connection");
 	}
 	else{
 		printerror("Selecting $db_database",$con);
 	}
 }
 //edit safety forum threads
-function editSafetyThread($title,$content,$videoLink,$safetyID){
+function editSafetyThread($title,$content,$videoLink){
     require "config.php";
 	try {
 	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -50,8 +49,9 @@ function editSafetyThread($title,$content,$videoLink,$safetyID){
     date_default_timezone_set('Singapore');
     $date = date('Y/m/d H:i:s', time());
     $query=$con->prepare("UPDATE `workplacesafety` SET `safetyTitle`=?, `safetyContent`=?, `videoLink`=?,`lastEdited` =? WHERE `id`=?");
-	$query->bind_param('ssssi', $sanitizedTitle,$sanitizedContent,$sanitizedVideoLink,$date,$safetyID);
+	$query->bind_param('ssssi', $sanitizedTitle,$sanitizedContent,$sanitizedVideoLink,$date,$_SESSION['safetyID']);
 	if($query->execute()){ //executing query (processes and print the results)
+		unset($_SESSION['safetyID']);
         header("Location: http://localhost/SWAP-TP/Safety.php");
         die();
 	}
@@ -60,7 +60,7 @@ function editSafetyThread($title,$content,$videoLink,$safetyID){
 	}
 }
 //deleting safety forum threads
-function deleteSafety(){
+function deleteSafety($safetyID){
 	require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -74,7 +74,7 @@ function deleteSafety(){
     }
     else printok("Connecting to $db_hostname");
     $query=$con->prepare("DELETE FROM `workplacesafety` WHERE `id`=?");
-    $query->bind_param('i', $_GET['safetyID']); //bind the parameters
+    $query->bind_param('i', $safetyID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
         header("Location: http://localhost/SWAP-TP/Safety.php");
         die();

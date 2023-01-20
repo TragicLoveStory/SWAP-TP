@@ -17,6 +17,28 @@
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && isset($_SESSION["occupation"])){
         if($_SESSION["role"]==="LEAVE-ADMIN"){
+
+            if (isset($_POST['denyLeave']) && $_POST['denyLeave'] === 'Deny') {
+                if(!empty($_POST['denyLeaveID'])){
+                    denyLeaveRequest($_POST['denyLeaveID']);
+                }
+            }
+            if (isset($_POST['denyMc']) && $_POST['denyMc'] === 'Deny') {
+                if(!empty($_POST['denyMcID'])){
+                    denyMcRequest($_POST['denyMcID']);
+                }
+            }
+            if (isset($_POST['approveLeave']) && $_POST['approveLeave'] === 'Approve') {
+                if(!empty($_POST['approveLeaveID']) && !empty($_POST['approveLeaveUserId']) && !empty($_POST['approveLeaveStartDate']) && !empty($_POST['approveLeaveEndDate']) && !empty($_POST['approveLeaveDays'])){
+                    approveLeaveRequest($_POST['approveLeaveID'],$_POST['approveLeaveUserId'],$_POST['approveLeaveStartDate'],$_POST['approveLeaveEndDate'],$_POST['approveLeaveDays']);
+                }
+            }
+            if (isset($_POST['approveMc']) && $_POST['approveMc'] === 'Approve') {
+                if(!empty($_POST['approveMcID']) && !empty($_POST['approveMcUserId']) && !empty($_POST['approveMcStartDate']) && !empty($_POST['approveMcEndDate']) && !empty($_POST['approveMcDays'])){
+                    approveMcRequest($_POST['approveMcID'],$_POST['approveMcUserId'],$_POST['approveMcStartDate'],$_POST['approveMcEndDate'],$_POST['approveMcDays']);
+                }
+            }
+
             //connection to internalhr database
             try {
                 $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -48,7 +70,23 @@
                 $department = $row['department'];
                 $timeOfSubmission = $row['timeOfSubmission'];
                 $status = $row['status'];
-                echo "<tr><th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th><th><a href='authoriseLeave.php?leaveApproval=true&ALID=".$id."&uid=".$userId."&sd1=".strtotime($startDate)."&ed1=".strtotime($endDate)."&td=".$Days."'>Approve</a></th><th><a href='authoriseLeave.php?leaveDeny=true&DLID=".$id."'>Deny</a></th></tr>";
+                echo "<tr><th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th>
+                <th>
+                    <form action='authoriseLeave.php' method='POST'>
+                        <input type='hidden' name='approveLeaveID' value=".$id.">
+                        <input type='hidden' name='approveLeaveUserId' value=".$userId.">
+                        <input type='hidden' name='approveLeaveStartDate' value=".strtotime($startDate).">
+                        <input type='hidden' name='approveLeaveEndDate' value=".strtotime($endDate).">
+                        <input type='hidden' name='approveLeaveDays' value=".$Days.">
+                        <input type='submit' name='approveLeave' value='Approve'>
+                    </form>
+                </th>
+                <th>
+                    <form action='authoriseLeave.php' method='POST'>
+                        <input type='hidden' name='denyLeaveID' value=".$id.">
+                        <input type='submit' name='denyLeave' value='Deny'>
+                    </form>
+                </th></tr>";
             }
             echo "</table></div>";
             // loading of MC requests
@@ -68,9 +106,28 @@
                 $department2 = $row2['department'];
                 $timeOfSubmission2 = $row2['timeOfSubmission'];
                 $status2 = $row2['status'];
-                echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th><th><a href='authoriseLeave.php?mcApproval=true&AMCID=".$id2."&uid=".$userId2."&sd2=".strtotime($startDate2)."&ed2=".strtotime($endDate2)."&td=".$Days2."'>Approve</a></th><th><a href='authoriseLeave.php?mcDeny=true&DMCID=".$id2."'>Deny</a></th></tr>";
+                echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th>
+                <th>
+                    <form action='authoriseLeave.php' method='POST'>
+                        <input type='hidden' name='approveMcID' value=".$id2.">
+                        <input type='hidden' name='approveMcUserId' value=".$userId2.">
+                        <input type='hidden' name='approveMcStartDate' value=".strtotime($startDate2).">
+                        <input type='hidden' name='approveMcEndDate' value=".strtotime($endDate2).">
+                        <input type='hidden' name='approveMcDays' value=".$Days2.">
+                        <input type='submit' name='approveMc' value='Approve'>
+                    </form>
+                </th>
+                <th>
+                    <form action='authoriseLeave.php' method='POST'>
+                        <input type='hidden' name='denyMcID' value=".$id2.">
+                        <input type='submit' name='denyMc' value='Deny'>
+                    </form>
+                </th></tr>";
             }
             echo "</table></div>";
+        }
+        elseif($_SESSION['occupation'] === "MANAGER"){
+
             if (isset($_GET['leaveDeny']) && $_GET['leaveDeny'] === 'true') {
                 denyLeaveRequest();
             }
@@ -83,8 +140,7 @@
             if (isset($_GET['mcApproval']) && $_GET['mcApproval'] === 'true') {
                 approveMcRequest();
             }
-        }
-        elseif($_SESSION['occupation'] === "MANAGER"){
+
             //connection to internalhr database
             try {
                 $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -140,18 +196,6 @@
                 echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th><th><a href='authoriseLeave.php?mcApproval=true&AMCID=".$id2."&uid=".$userId2."&sd2=".strtotime($startDate2)."&ed2=".strtotime($endDate2)."&td=".$Days2."'>Approve</a></th><th><a href='authoriseLeave.php?mcDeny=true&DMCID=".$id2."'>Deny</a></th></tr>";
             }
             echo "</table></div>";
-            if (isset($_GET['leaveDeny']) && $_GET['leaveDeny'] === 'true') {
-                denyLeaveRequest();
-            }
-            if (isset($_GET['mcDeny']) && $_GET['mcDeny'] === 'true') {
-                denyMcRequest();
-            }
-            if (isset($_GET['leaveApproval']) && $_GET['leaveApproval'] === 'true') {
-                approveLeaveRequest();
-            }
-            if (isset($_GET['mcApproval']) && $_GET['mcApproval'] === 'true') {
-                approveMcRequest();
-            }
         }
         else{
             echo "Error: Denied access.";

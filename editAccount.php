@@ -16,6 +16,11 @@
             echo "Only permitted for User Admins.";
             die();
         } 
+        elseif(!isset($_GET['editing']) || $_GET['editing'] != "true"){
+            echo "Error.";
+            die();
+        }
+
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }
@@ -33,9 +38,8 @@
         require_once "config.php";
 
         if(isset($_GET['editing']) && $_GET['editing']==="true"){
-            $userID= $_GET['TheUserId'];
             $query=$con->prepare("SELECT * FROM `users` WHERE `ID` =?");
-            $query->bind_param('i', $userID); //bind the parameters
+            $query->bind_param('i', $_SESSION['editUserId']); //bind the parameters
             $query->execute();
             $result = $query-> get_result();
             $row = $result -> fetch_assoc();
@@ -44,7 +48,7 @@
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Account"){
             if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
                 //echo "No fields are empty<br>";
-                edituser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation'],$row['ID']);
+                edituser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation']);
             } 
             else{
                 echo "Error: No fields should be empty<br>";

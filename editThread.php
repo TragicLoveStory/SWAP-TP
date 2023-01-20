@@ -18,6 +18,10 @@
             echo "Must be logged in.";
             die();
         }
+        elseif(!isset($_GET['editing']) || $_GET['editing'] != "true"){
+            echo "Error.";
+            die();
+        }
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }
@@ -31,7 +35,7 @@
             else printok("Connecting to $db_hostname");
         if(isset($_GET['editing']) && $_GET['editing']==="true"){
             $query=$con->prepare("SELECT `title`,`content`,`userId` FROM `forum` WHERE `id` =?");
-            $query->bind_param('i', $_GET['forumID']); //bind the parameters
+            $query->bind_param('i', $_SESSION['forumID']); //bind the parameters
             $query->execute();
             $result = $query-> get_result();
             $row = $result -> fetch_assoc();
@@ -39,7 +43,7 @@
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Thread"){
             if(!empty($_POST['title']) && !empty($_POST['content'])){
                 require_once "forumFunctions.php";
-                editThread($_POST['title'],$_POST['content'],$_GET['forumID']);
+                editThread($_POST['title'],$_POST['content'],$_SESSION['forumID']);
             }
             else{
                 echo "Error: No fields should be empty<br>";

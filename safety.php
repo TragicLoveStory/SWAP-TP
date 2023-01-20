@@ -15,6 +15,16 @@
     require "safetyFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "FORUM-ADMIN"){
+
+        if (isset($_POST['deletion']) && $_POST['deletion'] === 'Delete') {
+            deleteSafety($_POST['dislikeSafetyID']);
+        }
+        if (isset($_POST['editing']) && $_POST['editing'] === 'Edit') {
+            $_SESSION['safetyID'] = $_POST['editSafetyID'];
+            header("Location: http://localhost/SWAP-TP/editSafety.php?editingSafety=true");
+            die();
+        }
+
         echo '<form action="createSafety.php" method="POST"><input type="submit" value="Create new Safety Thread"></form>';
         //connection to internalhr database
         try {
@@ -37,12 +47,21 @@
             "<th>id</th><th>safetyTitle</th><th>safetyContent</th><th>videoLink</th><th>createOn</th><th>lastEdited</th></tr>";
             while($query->fetch())
             {
-                echo "<tr><th>$id</th><th><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></th><th>$safetyContent</th><th>$videoLink</th><th>$createOn</th><th>$lastEdited</th><th><a href='editSafety.php?editing=true&safetyID=".$id."'>Edit</a></th><th><a href='Safety.php?deletion=true&safetyID=".$id."'>Delete</a></th></tr>";
+                echo "<tr><th>$id</th><th><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></th><th>$safetyContent</th><th>$videoLink</th><th>$createOn</th><th>$lastEdited</th>
+                <th>
+                    <form action='Safety.php' method='POST'>
+                        <input type='hidden' name='editSafetyID' value=".$id.">
+                        <input type='submit' name='editing' value='Edit'>
+                    </form>
+                </th>
+                <th>
+                    <form action='Safety.php' method='POST'>
+                        <input type='hidden' name='dislikeSafetyID' value=".$id.">
+                        <input type='submit' name='deletion' value='Delete'>
+                    </form>
+                </th></tr>";
             }
             echo "</table>";
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteSafety();
-        }
 }
     elseif (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] !== "FORUM-ADMIN"){
         //connection to internalhr database

@@ -16,6 +16,22 @@
             echo "Only permitted for Users.";
             die();
         } 
+
+        if(isset($_POST['editProfile']) && $_POST['editProfile'] === "Edit Profile"){
+            header("Location: http://localhost/SWAP-TP/editProfile.php");
+		    die();
+        }
+        if(isset($_POST['logout']) && $_POST['logout'] === "Logout"){
+            include "Authentication.php";
+            logout();
+        }
+        if(isset($_POST['enableOTP']) && $_POST['enableOTP'] === "Enable OTP"){
+            enableOTP();
+        }
+        if(isset($_POST['disableOTP']) && $_POST['disableOTP'] === "Disable OTP"){
+            disableOTP();
+        }
+
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }
@@ -44,18 +60,6 @@
         else{
             printerror("Selecting $db_database",$con);
         }
-
-        if(isset($_POST['editProfile']) && $_POST['editProfile'] === "Edit Profile"){
-            header("Location: http://localhost/SWAP-TP/editProfile.php");
-		    die();
-        }
-        if(isset($_POST['logout']) && $_POST['logout'] === "Logout"){
-            include "Authentication.php";
-            logout();
-        }
-        if(isset($_POST['enableOTP']) && $_POST['enableOTP'] === "Enable OTP"){
-            enableOTP();
-        }
     ?>
     <div class="container" style="display: flex; flex-direction: column; align-items:center;">
         <p style="text-align: center;">Email: <?= $row['email']; ?></p>
@@ -72,6 +76,9 @@
         </form>
         <?php if($otpStatus == "Enabled") : ?> 
             <p>OTP: <?= $otpStatus ?></p>
+            <form action="profile.php" method="POST" style="text-align: center;">
+                <input type="submit" name="disableOTP" value="Disable OTP">
+            </form>
         <?php else : ?>
             <p>OTP: <?= $otpStatus ?></p>
             <form action="profile.php" method="POST" style="text-align: center;">

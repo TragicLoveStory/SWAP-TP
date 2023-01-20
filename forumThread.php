@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"> -->
 </head>
 <body>
@@ -38,10 +39,17 @@
             $result = $query->get_result();
             $row = $result->fetch_assoc(); 
         }
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteThread();
+        if (isset($_POST['deletion']) && $_POST['deletion'] === 'Delete') {
+            deleteThread($_GET['forumID']);
+        }
+        if (isset($_POST['editing']) && $_POST['editing'] === 'Edit'){
+            $_SESSION['forumID'] = $_GET['forumID'];
+            header("Location: http://localhost/SWAP-TP/editThread.php?editing=true");
+            die();
         }
         viewCounter($row['viewCount'],$_GET['forumID']);
+        $uri = $_SERVER['REQUEST_URI'];
+        $fullUri = "http://localhost${uri}";
     ?>
     <?php if($_SESSION['ID'] == $row['userId']) : ?>
         <table align='center' border='1'>
@@ -49,7 +57,23 @@
                 <th>email</th><th>first name</th><th>last name</th><th>title</th><th>content</th><th>createOn</th><th>lastEdited</th><th>viewCount</th>
             </tr>
             <tr>
-                <th><?= $row['email'] ?></th><th><?= $row['first_name'] ?></th><th><?= $row['last_name'] ?></th><th><?= $row['title'] ?></th><th class="Content"><span style="white-space: pre-wrap;"><?= $row['content'] ?></span></th><th><?= $row['createOn'] ?></th><th><?= $row['lastEdited'] ?></th><th><?= $row['viewCount']+1 ?></th><th><a href='editThread.php?editing=true&forumID=<?= $_GET['forumID'] ?>'>Edit</a></th><th><a href='forumThread.php?deletion=true&FD=<?= $_GET['forumID'] ?>'>Delete</a></th>
+                <th><?= $row['email'] ?></th>
+                <th><?= $row['first_name'] ?></th>
+                <th><?= $row['last_name'] ?></th>
+                <th><?= $row['title'] ?></th>
+                <th class="Content"><span style="white-space: pre-wrap;"><?= $row['content'] ?></span></th>
+                <th><?= $row['createOn'] ?></th><th><?= $row['lastEdited'] ?></th>
+                <th><?= $row['viewCount']+1 ?></th>
+                <th>
+                    <form action="<?= $fullUri ?>" method='POST'>
+                        <input type='submit' name='editing' value='Edit'>
+                    </form>
+                </th>
+                <th>
+                    <form action="<?= $fullUri ?>" method='POST'>
+                        <input type='submit' name='deletion' value='Delete'>
+                    </form>
+                </th>
             </tr>
         </table>
     <?php else : ?>
@@ -63,6 +87,50 @@
         </table>
     <?php endif; ?>
     <?php 
+     if(isset($_POST['commentSubmit']) && $_POST['commentSubmit']=== "Create Comment"){
+        $_SESSION['forumId'] = $_GET['forumID'];
+        header("Location: http://localhost/SWAP-TP/createComment.php");
+        die();
+    }
+
+    if (isset($_POST['editingComment']) && $_POST['editingComment'] === 'Edit') {
+        $_SESSION['commentId'] = $_POST['editCommentID'];
+        header("Location: http://localhost/SWAP-TP/editComment.php?editingComment=true");
+        die();
+    }
+
+    if (isset($_POST['deletionComment']) && $_POST['deletionComment'] === 'Delete') {
+        if(!empty($_POST['commentID'])){
+            deleteComment($_POST['commentID'],$_GET['forumID']);
+        }
+        else{
+            echo "Error.";
+            die();
+        }
+        
+    }
+
+    if (isset($_POST['likeComment']) && $_POST['likeComment'] == "Like"){
+        if(!empty($_POST['likeCommentID'])){
+            likeComment($_POST['likeCommentID'],$_GET['forumID']);
+        }
+    }
+    if (isset($_POST['likeComment']) && $_POST['likeComment'] == "Liked!"){
+        if(!empty($_POST['likeCommentID'])){
+            likeComment($_POST['likeCommentID'],$_GET['forumID']);
+        }
+    }
+
+    if (isset($_POST['dislikeComment']) && $_POST['dislikeComment'] == "Dislike"){
+        if(!empty($_POST['dislikeCommentID'])){
+            dislikeComment($_POST['dislikeCommentID'],$_GET['forumID']);
+        }
+    }
+    if (isset($_POST['dislikeComment']) && $_POST['dislikeComment'] == "Disliked!"){
+        if(!empty($_POST['dislikeCommentID'])){
+            dislikeComment($_POST['dislikeCommentID'],$_GET['forumID']);
+        }
+    }
     $uri = $_SERVER['REQUEST_URI'];
     $fullUri = "http://localhost${uri}";
     if($row['status'] === 1){
@@ -117,36 +185,48 @@
             }
 
             if($_SESSION['ID'] === $row2['userId']){
-                echo "<tr><th>$id</th><th>$userId</th><th>$forumId</th><th>$comment</th><th>$createOn</th><th>$department</th><th>$role</th><th>$likeCounter</th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=l'>$likeStatus</a></th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=d'>$dislikeStatus</a></th><th><a href='forumThread.php?editingComment=true&commentID=".$id."'>Edit</a></th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&deletionComment=true&commentID=".$id."''>Delete</a></th></tr>";
+                echo "<tr><th>$id</th><th>$userId</th><th>$forumId</th><th>$comment</th><th>$createOn</th><th>$department</th><th>$role</th><th>$likeCounter</th>
+                <th>
+                <form action=".$fullUri." method='POST'>
+                    <input type='hidden' name='likeCommentID' value=".$id.">
+                    <input type='submit' name='likeComment' value=".$likeStatus.">
+                </form>
+                </th>
+                <th>
+                <form action=".$fullUri." method='POST'>
+                    <input type='hidden' name='dislikeCommentID' value=".$id.">
+                    <input type='submit' name='dislikeComment' value=".$dislikeStatus.">
+                </form>
+                </th>
+                <th>
+                <form action=".$fullUri." method='POST'>
+                    <input type='hidden' name='editCommentID' value=".$id.">
+	                <input type='submit' name='editingComment' value='Edit'>
+                </form>
+                </th>
+                <th>
+                <form action=".$fullUri." method='POST'>
+                    <input type='hidden' name='commentID' value=".$id.">
+	                <input type='submit' name='deletionComment' value='Delete'>
+                </form>
+                </th></tr>";
             }
             else{  
-                echo "<tr><th>$id</th><th>$userId</th><th>$forumId</th><th>$comment</th><th>$createOn</th><th>$department</th><th>$role</th><th>$likeCounter</th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=l'>$likeStatus</a></th><th><a href='forumThread.php?forumID=".$_GET['forumID']."&cID=".$id."&lc=d'>$dislikeStatus</a></th></tr>";
+                echo "<tr><th>$id</th><th>$userId</th><th>$forumId</th><th>$comment</th><th>$createOn</th><th>$department</th><th>$role</th><th>$likeCounter</th>
+                <th>
+                <form action=".$fullUri." method='POST'>
+                    <input type='hidden' name='likeCommentID' value=".$id.">
+                    <input type='submit' name='likeComment' value=".$likeStatus.">
+                </form>
+                </th>
+                <th>
+                <form action=".$fullUri." method='POST'>
+                    <input type='hidden' name='dislikeCommentID' value=".$id.">
+                    <input type='submit' name='dislikeComment' value=".$dislikeStatus.">
+                </form>
+                </th></tr>";
             }
             
-        }
-    }
-
-    if(isset($_POST['commentSubmit']) && $_POST['commentSubmit']=== "Create Comment"){
-        $_SESSION['forumId'] = $_GET['forumID'];
-        header("Location: http://localhost/SWAP-TP/createComment.php");
-        die();
-    }
-
-    if (isset($_GET['editingComment']) && $_GET['editingComment'] === 'true') {
-        $_SESSION['commentId'] = $_GET['commentID'];
-        header("Location: http://localhost/SWAP-TP/editComment.php?editingComment=true");
-        die();
-    }
-
-    if (isset($_GET['deletionComment']) && $_GET['deletionComment'] === 'true') {
-        deleteComment();
-    }
-    if (isset($_GET['lc'])) {
-        if($_GET['lc'] === 'l'){
-            likeComment();
-        }
-        elseif($_GET['lc'] === 'd'){
-            dislikeComment();
         }
     }
     ?>

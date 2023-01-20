@@ -18,6 +18,11 @@
             echo "Must be logged in.";
             die();
         }
+        elseif(!isset($_GET['editingSafety']) || $_GET['editingSafety'] != "true"){
+            echo "Error.";
+            die();
+        }
+
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }
@@ -29,9 +34,9 @@
                 die();
             }
             else printok("Connecting to $db_hostname");
-        if(isset($_GET['editing']) && $_GET['editing']==="true"){
+        if(isset($_GET['editingSafety']) && $_GET['editingSafety']==="true"){
             $query=$con->prepare("SELECT `safetyTitle`,`safetyContent`,`videoLink`FROM `workplacesafety` WHERE `id` =?");
-            $query->bind_param('i', $_GET['safetyID']); //bind the parameters
+            $query->bind_param('i', $_SESSION['safetyID']); //bind the parameters
             $query->execute();
             $result = $query-> get_result();
             $row = $result -> fetch_assoc();
@@ -39,7 +44,7 @@
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Safety Thread"){
             if(!empty($_POST['video']) && !empty($_POST['content']) && !empty($_POST['title'])){
                 require_once "safetyFunctions.php";
-                editSafetyThread($_POST['title'],$_POST['content'],$_POST['video'],$_GET['safetyID']);
+                editSafetyThread($_POST['title'],$_POST['content'],$_POST['video']);
             }
             else{
                 echo "Error: No fields should be empty<br>";

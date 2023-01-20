@@ -16,6 +16,10 @@
             echo "Must be logged in.";
             die();
         }
+        elseif(!isset($_GET['editingComment']) || $_GET['editingComment'] != "true"){
+            echo "Error.";
+            die();
+        }
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }

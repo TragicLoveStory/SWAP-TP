@@ -138,14 +138,13 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	if($query->execute()){ //executing query (processes and print the results)
 		header("Location: http://localhost/SWAP-TP/userList.php");
 		die();
-		printok("Closing connection");
 	}
 	else{
 		printerror("Selecting $db_database",$con);
 	}
 }
 
-function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$occupation,$id){
+function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contact, $department,$occupation){
 	require "config.php";
 
 	try {
@@ -232,18 +231,18 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	//hashing password
 	$hashed_password = password_hash($sanitizedPassword,PASSWORD_DEFAULT);
 	$query=$con->prepare("UPDATE `users` SET `email`=?, `password`=?, `first_name`=?, `last_name`=?, `date_of_birth`=?, `contact`=?, `department`=?, `occupation`=? WHERE `ID` = ?");
-	$query->bind_param('sssssissi', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$sanitizedOccupation,$id);
+	$query->bind_param('sssssissi', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$sanitizedOccupation,$_SESSION['editUserId']);
 	if($query->execute()){ //executing query (processes and print the results)
+		unset($_SESSION['editUserId']);
 		header("Location: http://localhost/SWAP-TP/userList.php");
 		die();
-		printok("Closing connection");
 	}
 	else{
 		printerror("Selecting $db_database",$con);
 	}
 }
 // deletion of accounts
-function deleteItem() {
+function deleteItem($userId) {
 	require "config.php";
 	try {
 		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -256,13 +255,8 @@ function deleteItem() {
 		die();
 	}
 	else printok("Connecting to $db_hostname");
-	$uri = $_SERVER['REQUEST_URI'];
-	$fullUri = "http://localhost${uri}";
-	$url_components = parse_url($fullUri);
-	parse_str($url_components['query'], $params);
-	$userEmail = $params['TheUserId'];
 	$query=$con->prepare("DELETE FROM `users` WHERE `ID`=?");
-	$query->bind_param('s', $userEmail); //bind the parameters
+	$query->bind_param('s', $userId); //bind the parameters
 	if($query->execute()){ //executing query (processes and print the results)
 		header("Location: http://localhost/SWAP-TP/userList.php");
 		die();
@@ -405,6 +399,28 @@ function enableOTP(){
 }
 
 function disableOTP(){
+	require "config.php";
+	require "Authentication.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	else printok("Connecting to $db_hostname");
 
+	$otpStatus = -1;
+	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
+	$query->bind_param('ii', $otpStatus, $_SESSION['ID']); //bind the parameters
+	if($query->execute()){ //executing query (processes and print the results)
+		logout();
+	}
+	else{
+		echo "Error Executing Query";
+	}
 }
 ?>

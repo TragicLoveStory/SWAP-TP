@@ -14,6 +14,13 @@
     require "leaveFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="LEAVE-ADMIN"){
+
+        if (isset($_POST['deleteMc']) && $_POST['deleteMc'] === 'Delete') {
+            if(!empty($_POST['deleteMcID'])){
+                deleteMC($_POST['deleteMcID']);
+            }
+        }
+
         echo "Permitted for Leave Admins";
         //connection to internalhr database
         try {
@@ -38,13 +45,15 @@
         "<th>id</th><th>userId</th><th>mcFile</th><th>mcFile</th><th>Days</th><th>timeOfSubmission</th><th>status</th></tr>";
         while($query->fetch()){
             $fileName = basename("/".$mcFile);
-            echo "<th>$id</th><th>$userId</th><th><img src='$mcFile' class='image'></th><th>$fileName</th><th>$Days</th><th>$timeOfSubmission</th><th>$status</th><th><a href='mcList.php?deletion=true&mcID=".$id."'>Delete</a></th></tr>";
+            echo "<th>$id</th><th>$userId</th><th><img src='$mcFile' class='image'></th><th>$fileName</th><th>$Days</th><th>$timeOfSubmission</th><th>$status</th>
+            <th>
+                <form action='mcList.php' method='POST'>
+                    <input type='hidden' name='deleteMcID' value=".$id.">
+                    <input type='submit' name='deleteMc' value='Delete'>
+                </form>
+            </th></tr>";
         }
         echo "</table>";
-
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteMC();
-        }
     }
     else{
         echo "Only permitted for Attendance & Leave Admins";

@@ -19,3 +19,11 @@
 
 /*Login Form----------------------------------- */
 
+.linkLookingSubmit{
+    background: none;
+    border: none;
+    outline: none;
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}

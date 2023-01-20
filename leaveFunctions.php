@@ -78,7 +78,7 @@ function submitMC($days,$startDate,$endDate){
     }
 }
 
-function deleteMC(){
+function deleteMC($mcID){
     require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -92,7 +92,7 @@ function deleteMC(){
     }
     else printok("Connecting to $db_hostname");
     $query=$con->prepare("SELECT `mcFile` FROM `medicalcertificate` WHERE `id`=?");
-    $query->bind_param('i', $_GET['mcID']); //bind the parameters
+    $query->bind_param('i', $mcID); //bind the parameters
     $query->execute();
     $result = $query-> get_result();
     $row = $result -> fetch_assoc();
@@ -101,9 +101,10 @@ function deleteMC(){
         die();
     }
     else{
-        unlink($row['mcFile']);
+        $fileName = basename("/".$row['mcFile']);
+        rename($row['mcFile'],"archivedFiles/".$fileName);
         $query2=$con->prepare("DELETE FROM `medicalcertificate` WHERE `id`=?");
-        $query2->bind_param('i', $_GET['mcID']); //bind the parameters
+        $query2->bind_param('i', $mcID); //bind the parameters
         if($query2->execute()){ //executing query (processes and print the results)
             header("Location: http://localhost/SWAP-TP/mcList.php");
             die();
@@ -154,7 +155,7 @@ function submitLeave($days,$startDate,$endDate,$reason){
     }
 }
 
-function deleteLeave(){
+function deleteLeave($leaveID){
     require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -168,7 +169,7 @@ function deleteLeave(){
     }
     else printok("Connecting to $db_hostname");
     $query1=$con->prepare("DELETE FROM `workleave` WHERE `id`=?");
-    $query1->bind_param('i', $_GET['leaveID']); //bind the parameters
+    $query1->bind_param('i', $leaveID); //bind the parameters
     if($query1->execute()){ //executing query (processes and print the results)
         header("Location: http://localhost/SWAP-TP/leaveList.php");
         die();
@@ -178,7 +179,7 @@ function deleteLeave(){
     }  
 }
 
-function denyLeaveRequest(){
+function denyLeaveRequest($leaveID){
     require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -193,7 +194,7 @@ function denyLeaveRequest(){
     else printok("Connecting to $db_hostname");
     $deniedStatus = 0;
     $query=$con->prepare("UPDATE workleave SET `status`=? WHERE `id`=?");
-    $query->bind_param('ii',$deniedStatus, $_GET['DLID']); //bind the parameters
+    $query->bind_param('ii',$deniedStatus, $leaveID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
         header("Location: http://localhost/SWAP-TP/authoriseLeave.php");
         die();
@@ -203,7 +204,7 @@ function denyLeaveRequest(){
     }
 }
 
-function denyMcRequest(){
+function denyMcRequest($MCID){
     require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -218,7 +219,7 @@ function denyMcRequest(){
     else printok("Connecting to $db_hostname");
     $deniedStatus = 0;
     $query=$con->prepare("UPDATE medicalcertificate SET `status`=? WHERE `id`=?");
-    $query->bind_param('ii',$deniedStatus, $_GET['DMCID']); //bind the parameters
+    $query->bind_param('ii',$deniedStatus, $MCID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
         header("Location: http://localhost/SWAP-TP/authoriseLeave.php");
         die();
@@ -228,7 +229,7 @@ function denyMcRequest(){
     }
 }
 
-function approveLeaveRequest(){
+function approveLeaveRequest($leaveID,$userID,$startDate,$endDate,$totalDays){
     require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -242,25 +243,25 @@ function approveLeaveRequest(){
     }
     else printok("Connecting to $db_hostname");
     date_default_timezone_set('Asia/Singapore');
-    $start = new DateTime(date('Y-m-d',$_GET['sd1']));
-    $end = new DateTime(date('Y-m-d',$_GET['ed1']));
+    $start = new DateTime(date('Y-m-d',$startDate));
+    $end = new DateTime(date('Y-m-d',$endDate));
     $days  = $end->diff($start)->format('%a');
     $days+=1;
-    if($_GET['td'] != $days){
+    if($totalDays != $days){
         echo "days not consistent.";
-        echo $_GET['td'];
+        echo $totalDays;
         echo $days;
         die();
     }
     $approvedStatus = 1;
     $query=$con->prepare("UPDATE workleave SET `status`=? WHERE `id`=?");
-    $query->bind_param('ii',$approvedStatus, $_GET['ALID']); //bind the parameters
+    $query->bind_param('ii',$approvedStatus, $leaveID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
         for($i = $start; $i <= $end; $i->modify('+1 day')){
             $iteratedDate = $i->format("Y-m-d");
 
             $query2=$con->prepare("SELECT `Date` FROM `attendance` WHERE `Date` LIKE ? AND `userId` = ?");
-            $query2->bind_param('si', $iteratedDate,$_GET['uid']); //bind the parameters
+            $query2->bind_param('si', $iteratedDate,$userID); //bind the parameters
             $query2->execute();
             $result = $query2-> get_result();
             $row = $result -> fetch_assoc();
@@ -271,7 +272,7 @@ function approveLeaveRequest(){
             else{
                 $workAttendance = 1;
                 $query3=$con->prepare("INSERT INTO `attendance` (`userId`,`status`,`Date`) VALUES (?,?,?)");
-                $query3->bind_param('iis',$_GET['uid'],$workAttendance,$iteratedDate);
+                $query3->bind_param('iis',$userID,$workAttendance,$iteratedDate);
                 if($query3->execute()){
 
                 }
@@ -289,7 +290,7 @@ function approveLeaveRequest(){
     }
 }
 
-function approveMcRequest(){
+function approveMcRequest($MCID,$userID,$startDate,$endDate,$totalDays){
     require "config.php";
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -303,25 +304,25 @@ function approveMcRequest(){
     }
     else printok("Connecting to $db_hostname");
     date_default_timezone_set('Asia/Singapore');
-    $start = new DateTime(date('Y-m-d',$_GET['sd2']));
-    $end = new DateTime(date('Y-m-d',$_GET['ed2']));
+    $start = new DateTime(date('Y-m-d',$startDate));
+    $end = new DateTime(date('Y-m-d',$endDate));
     $days  = $end->diff($start)->format('%a');
     $days+=1;
-    if($_GET['td'] != $days){
+    if($totalDays != $days){
         echo "days not consistent.<br>";
-        echo $_GET['td']."<br>";
+        echo $totalDays."<br>";
         echo $days;
         die();
     }
     $approvedStatus = 1;
     $query=$con->prepare("UPDATE medicalcertificate SET `status`=? WHERE `id`=?");
-    $query->bind_param('ii',$approvedStatus, $_GET['AMCID']); //bind the parameters
+    $query->bind_param('ii',$approvedStatus, $MCID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
         for($i = $start; $i <= $end; $i->modify('+1 day')){
             $iteratedDate = $i->format("Y-m-d");
 
             $query2=$con->prepare("SELECT `Date` FROM `attendance` WHERE `Date` LIKE ? AND `userId` = ?");
-            $query2->bind_param('si', $iteratedDate,$_GET['uid']); //bind the parameters
+            $query2->bind_param('si', $iteratedDate,$userID); //bind the parameters
             $query2->execute();
             $result = $query2-> get_result();
             $row = $result -> fetch_assoc();
@@ -332,7 +333,7 @@ function approveMcRequest(){
             else{
                 $workAttendance = 1;
                 $query3=$con->prepare("INSERT INTO `attendance` (`userId`,`status`,`Date`) VALUES (?,?,?)");
-                $query3->bind_param('iis',$_GET['uid'],$workAttendance,$iteratedDate);
+                $query3->bind_param('iis',$userID,$workAttendance,$iteratedDate);
                 if($query3->execute()){
 
                 }
@@ -350,7 +351,7 @@ function approveMcRequest(){
     }
 }
 
-function deleteLeaveRequest(){
+function deleteLeaveRequest($leaveID){
     require "config.php";
     try {
     $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -364,7 +365,7 @@ function deleteLeaveRequest(){
     }
     else printok("Connecting to $db_hostname");
     $query1=$con->prepare("DELETE FROM `workleave` WHERE `id`=?");
-    $query1->bind_param('i', $_GET['LDID']); //bind the parameters
+    $query1->bind_param('i', $leaveID); //bind the parameters
     if($query1->execute()){ //executing query (processes and print the results)
         header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
         die();
@@ -374,7 +375,7 @@ function deleteLeaveRequest(){
     } 
 }
 
-function deleteMcRequest(){
+function deleteMcRequest($MCID){
     require "config.php";
     try {
     $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -387,15 +388,30 @@ function deleteMcRequest(){
         die();
     }
     else printok("Connecting to $db_hostname");
-    $query1=$con->prepare("DELETE FROM `medicalcertificate` WHERE `id`=?");
-    $query1->bind_param('i', $_GET['MCDID']); //bind the parameters
+    $query1=$con->prepare("SELECT `mcFile` FROM `medicalcertificate` WHERE `id`=?");
+    $query1->bind_param('i', $MCID); //bind the parameters
     if($query1->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
-        die();
-    }
-    else{
-        echo "Error Executing Query";
-    } 
+        $result = $query1-> get_result();
+        $row = $result -> fetch_assoc();
+        if(!$row){
+            echo "Error.";
+            header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+            die();
+        }
+        else{
+            $fileName = basename("/".$row['mcFile']);
+            rename($row['mcFile'],"archivedFiles/".$fileName);
+            $query2=$con->prepare("DELETE FROM `medicalcertificate` WHERE `id`=?");
+            $query2->bind_param('i', $MCID); //bind the parameters
+            if($query2->execute()){ //executing query (processes and print the results)
+                header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+                die();
+            }
+            else{
+                echo "Error Executing Query";
+            }
+        }   
+    }  
 }
 
 function editMC($days,$startDate,$endDate){
@@ -458,7 +474,7 @@ function editMC($days,$startDate,$endDate){
         }
         else{
             $query=$con->prepare("SELECT `mcFile` from medicalcertificate WHERE `id`=?");
-            $query->bind_param('i',$_GET['mcEID']);
+            $query->bind_param('i',$_SESSION['MCID']);
             $query->execute();
             $result = $query-> get_result();
             $row = $result -> fetch_assoc();
@@ -467,7 +483,7 @@ function editMC($days,$startDate,$endDate){
             //date_default_timezone_set('Singapore');
             //$date = date('y/m/d H:i:s', time());
             $query2=$con->prepare("UPDATE medicalcertificate SET `mcFile`=?,`Days`=?, `startDate`=?, `endDate`=? WHERE `id`=?");
-            $query2->bind_param('sissi',$target_file,$days,$startDate,$endDate,$_GET['mcEID']);
+            $query2->bind_param('sissi',$target_file,$days,$startDate,$endDate,$_SESSION['MCID']);
             if($query2->execute()){ //executing query (processes and print the results)
                 header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
                 die();
@@ -510,8 +526,9 @@ function editLeave($days,$startDate,$endDate,$reason){
 	}
     $sanitizedReason = htmlspecialchars($reason);
     $query=$con->prepare("UPDATE `workleave` SET `Days`=?,`startDate`=?,`endDate`=?,`Reason`=? WHERE `id`=?");
-    $query->bind_param('isssi',$days,$startDate,$endDate,$reason,$_GET['LEID']);
+    $query->bind_param('isssi',$days,$startDate,$endDate,$reason,$_SESSION['leaveID']);
     if($query->execute()){ //executing query (processes and print the results)
+        unset($_SESSION['leaveID']);
         header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
         die();
     }

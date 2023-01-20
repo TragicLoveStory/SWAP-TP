@@ -15,9 +15,11 @@
     require "forumFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] !== "FORUM-ADMIN"){
-        $uri = $_SERVER['REQUEST_URI'];
-        $fullUri = "http://localhost${uri}";
-        echo '<form action='.$fullUri.' method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';
+        if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
+            header("Location: http://localhost/SWAP-TP/createThread.php");
+            die();
+        }
+        echo '<form action="Forum.php" method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -42,16 +44,41 @@
                 echo "<tr><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$lastEdited</th><th>$viewCount</th></tr>";
             }
             echo "</table>";
-
+    }
+    elseif(isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "FORUM-ADMIN"){
+        if (isset($_POST['deletion']) && $_POST['deletion'] === 'Delete') {
+            if(!empty($_POST['FD'])){
+                deleteThread($_POST['FD']);
+            }
+            else{
+                echo "Error.";
+                die();
+            }     
+        }
+        if (isset($_POST['archive']) && $_POST['archive'] === 'Archive') {
+            if(!empty($_POST['FD']) && !empty($_POST['archiveStatus'])){
+                archiveThread($_POST['archiveStatus'],$_POST['FD']);
+            }
+            else{
+                echo "Error.";
+                die();
+            }
+            
+        }
+        if (isset($_POST['archive']) && $_POST['archive'] === 'Unarchive') {
+            if(!empty($_POST['FD']) && !empty($_POST['archiveStatus'])){
+                archiveThread($_POST['archiveStatus'],$_POST['FD']);
+            }
+            else{
+                echo "Error.";
+                die();
+            }
+        }
         if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
             header("Location: http://localhost/SWAP-TP/createThread.php");
             die();
         }
-    }
-    elseif(isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "FORUM-ADMIN"){
-        $uri = $_SERVER['REQUEST_URI'];
-        $fullUri = "http://localhost${uri}";
-        echo '<form action='.$fullUri.' method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';
+        echo '<form action="Forum.php" method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -79,19 +106,10 @@
                 elseif($status == 0){
                     $archiveState = "Unarchive";
                 }
-                echo "<tr><th>$id</th><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$lastEdited</th><th>$viewCount</th><th>$status</th><th><a href='Forum.php?Archive=true&AID=".$status."&FD=".$id."'>$archiveState</a></th><th><a href='Forum.php?deletion=true&FD=".$id."'>Delete</a></th></tr>";
+                echo "<tr><th>$id</th><th>$email</th><th><a href='forumThread.php?forumID=".$id."'>$title</a></th><th>$createOn</th><th>$lastEdited</th><th>$viewCount</th><th>$status</th>
+                <th><form action='Forum.php' method='POST'><input type='hidden' name='archiveStatus' value=".$status."><input type='hidden' name='FD' value=".$id."><input type='submit' name='archive' value=".$archiveState."><input type='submit' name='deletion' value='Delete'></form></th></tr>";
             }
             echo "</table>";
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteThread();
-        }
-        if (isset($_GET['Archive']) && $_GET['Archive'] === 'true') {
-            archiveThread();
-        }
-        if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
-            header("Location: http://localhost/SWAP-TP/createThread.php");
-            die();
-        }
     }
     else{
         echo "Must be logged in.";

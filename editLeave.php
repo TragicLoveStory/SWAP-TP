@@ -17,6 +17,11 @@
        echo "Must be logged in.";
         die();
     }
+    elseif(!isset($_GET['leaveEditing']) || $_GET['leaveEditing'] != "true"){
+        echo "Error.";
+        die();
+    }
+
     try {
     $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
     }
@@ -29,7 +34,7 @@
     }
     else printok("Connecting to $db_hostname");
     $query=$con->prepare("SELECT `Days`,`Reason` from workleave WHERE `id`=?");
-    $query->bind_param('i',$_GET['LEID']);
+    $query->bind_param('i',$_SESSION['leaveID']);
     $query->execute();
     $result = $query-> get_result();
     $row = $result -> fetch_assoc();

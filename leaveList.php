@@ -14,6 +14,13 @@
     require "leaveFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="LEAVE-ADMIN"){
+
+        if (isset($_POST['deleteLeave']) && $_POST['deleteLeave'] === 'Delete') {
+            if(!empty($_POST['deleteLeaveID'])){
+                deleteLeave($_POST['deleteLeaveID']);
+            }
+        }
+
         echo "Permitted for Leave Admins";
         //connection to internalhr database
         try {
@@ -37,13 +44,15 @@
         echo
         "<th>id</th><th>userId</th><th>Days</th><th>Reason</th><th>timeOfSubmission</th><th>status</th></tr>";
         while($query->fetch()){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$timeOfSubmission</th><th>$status</th><th><a href='leaveList.php?deletion=true&leaveID=".$id."'>Delete</a></th></tr>";
+            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$timeOfSubmission</th><th>$status</th>
+            <th>
+                <form action='leaveList.php' method='POST'>
+                    <input type='hidden' name='deleteLeaveID' value=".$id.">
+                    <input type='submit' name='deleteLeave' value='Delete'>
+                </form>
+            </th></tr>";
         }
         echo "</table>";
-
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteLeave();
-        }
     }
     else{
         echo "Only permitted for Attendance & Leave Admins";

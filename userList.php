@@ -13,6 +13,20 @@
     require "userFunctions.php";
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="USER-ADMIN"){
+
+        if (isset($_POST['editUser']) && $_POST['editUser'] === 'Edit') {
+            if(!empty($_POST['editUserID'])){
+                $_SESSION['editUserId'] = $_POST['editUserID'];
+                header("Location: http://localhost/SWAP-TP/editAccount.php?editing=true");
+                die();
+            }
+        }
+        if (isset($_POST['deleteUser']) && $_POST['deleteUser'] === 'Delete') {
+            if(!empty($_POST['deleteUserID'])){
+                deleteItem($_POST['deleteUserID']);
+            }
+        }
+
         echo "Permitted for User Admins";
         //connection to internalhr database
         try {
@@ -35,13 +49,21 @@
         "<th>Id</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th></tr>";
         while($query->fetch())
         {
-            echo "<tr><th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$occupation</th><th>$role</th><th><a href='editAccount.php?editing=true&TheUserId=".$id."'>edit</a></th><th><a href='userList.php?deletion=true&TheUserId=".$id."'>delete</a></th></tr>";
+            echo "<tr><th>$id</th><th>$email</th><th>$password</th><th>$firstname</th><th>$lastname</th><th>$dateofbirth</th><th>$contact</th><th>$department</th><th>$occupation</th><th>$role</th>
+            <th>
+                <form action='userList.php' method='POST'>
+                    <input type='hidden' name='editUserID' value=".$id.">
+                    <input type='submit' name='editUser' value='Edit'>
+                </form>
+            </th>
+            <th>
+                <form action='userList.php' method='POST'>
+                    <input type='hidden' name='deleteUserID' value=".$id.">
+                    <input type='submit' name='deleteUser' value='Delete'>
+                </form>
+            </th></tr>";
         }
         echo "</table>";
-
-        if (isset($_GET['deletion']) && $_GET['deletion'] === 'true') {
-            deleteItem();
-        }
     }
     else{
         echo "Only permitted for User Admins.";

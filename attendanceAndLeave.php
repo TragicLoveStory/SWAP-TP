@@ -17,6 +17,33 @@
        echo "Must be logged in.";
         die();
     }  
+
+    if (isset($_POST['editLeave']) && $_POST['editLeave'] == "Edit"){
+        if(!empty($_POST['editLeaveID'])){
+            $_SESSION['leaveID'] = $_POST['editLeaveID'];
+            header("Location: http://localhost/SWAP-TP/editLeave.php?leaveEditing=true");
+            die();
+        }
+    }
+    if (isset($_POST['editMC']) && $_POST['editMC'] == "Edit"){
+        if(!empty($_POST['editMcID'])){
+            $_SESSION['MCID'] = $_POST['editMcID'];
+            header("Location: http://localhost/SWAP-TP/editMc.php?mcEditing=true");
+            die();
+        }
+    }
+
+    if (isset($_POST['deleteLeave']) && $_POST['deleteLeave'] === 'Delete') {
+        if(!empty($_POST['deleteLeaveID'])){
+            deleteLeaveRequest($_POST['deleteLeaveID']);
+        }
+    }
+    if (isset($_POST['deleteMC']) && $_POST['deleteMC'] === 'Delete') {
+        if(!empty($_POST['deleteMCID'])){
+            deleteMcRequest($_POST['deleteMCID']);
+        }
+    }
+    
     //connection to internalhr database
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -68,7 +95,19 @@
         $timeOfSubmission = $row2['timeOfSubmission'];
         $status = $row2['status'];
         if($status === -1){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th><th><a href='editLeave.php?leaveEditing=true&LEID=".$id."'>Edit</a></th><th><a href='attendanceAndLeave.php?leaveDeleting=true&LDID=".$id."'>Delete</a></th></tr>";
+            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th>
+            <th>
+                <form action='attendanceAndLeave.php' method='POST'>
+                    <input type='hidden' name='editLeaveID' value=".$id.">
+                    <input type='submit' name='editLeave' value='Edit'>
+                </form>
+            </th>
+            <th>
+                <form action='attendanceAndLeave.php' method='POST'>
+                    <input type='hidden' name='deleteLeaveID' value=".$id.">
+                    <input type='submit' name='deleteLeave' value='Delete'>
+                </form>
+            </th></tr>";
         }
         elseif($status === 1 || $status === 0){
             echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th></tr>";
@@ -96,7 +135,19 @@
         $timeOfSubmission2 = $row3['timeOfSubmission'];
         $status2 = $row3['status'];
         if($status2 === -1){
-            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th><th><a href='editMc.php?mcEID=".$id2."'>Edit</a></th><th><a href='attendanceAndLeave.php?mcDeleting=true&MCDID=".$id2."'>Delete</a></th></th></tr>";
+            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th>
+            <th>
+                <form action='attendanceAndLeave.php' method='POST'>
+                    <input type='hidden' name='editMcID' value=".$id2.">
+                    <input type='submit' name='editMC' value='Edit'>
+                </form>
+            </th>
+            <th>
+                <form action='attendanceAndLeave.php' method='POST'>
+                    <input type='hidden' name='deleteMCID' value=".$id2.">
+                    <input type='submit' name='deleteMC' value='Delete'>
+                </form>
+            </th></tr>";
         }
         elseif($status2 === 0 || $status2 === 1){
             echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th></tr>";
@@ -104,14 +155,6 @@
         
     }
     echo "</table></div>";
-
-    if (isset($_GET['leaveDeleting']) && $_GET['leaveDeleting'] === 'true') {
-        deleteLeaveRequest();
-    }
-    if (isset($_GET['mcDeleting']) && $_GET['mcDeleting'] === 'true') {
-        deleteMcRequest();
-    }
-
     ?>
     <!-- <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">
         <label for='mcDays'>Number of days for work leave:</label>

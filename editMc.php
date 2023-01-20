@@ -15,6 +15,11 @@
        echo "Must be logged in.";
         die();
     }  
+    elseif(!isset($_GET['mcEditing']) || $_GET['mcEditing'] != "true"){
+        echo "Error.";
+        die();
+    }
+
     $uri = $_SERVER['REQUEST_URI'];
     $fullUri = "http://localhost${uri}";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit MC"){
