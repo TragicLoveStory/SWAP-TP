@@ -1,29 +1,168 @@
-/* .imgbox{
-    height: 100vh;
-    width: 100vw;
-}
-
-.center-fit{
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    filter:brightness(50%);
-} */
-
 .backgroundImage{
-    background-image: url('Images/amcHome.jpg');
+    background-image: url('Images/amc1.jpg');
     background-size: cover;
 }
+.backgroundColor{
+    background-color: #FFFFFF;
+}
+.profilePicture{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.theNavbar{
+    background-color: #3f3c43 !important;
+    height: 65px !important;
+}
+.welcomeUserText{
+    text-align: center;
+}
 
-/*Login Form----------------------------------- */
 
-/*Login Form----------------------------------- */
+.indexDivision{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 3rem;
+}
+.indexDivisionText{
+    max-width: 500px;
+    text-align: left;
+}
+.forumIndexDiv{
+    position: relative;
+    max-width: 100%;
+    max-height: 250px;
+    /* gap: 450px; */
+    display: flex;
+    flex-direction: row;
+}
+.forumIndexDiv2{
+    position: relative;
+    width: 1000px;
+    max-height: 100%;
+}
+.forumIndexPhoto{
+    max-height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
 
-.linkLookingSubmit{
-    background: none;
-    border: none;
+.safetyIndexDiv{
+    position: relative;
+    max-width: 100%;
+    max-height: 250px;
+    margin-top: 3rem;
+    /* gap: 450px; */
+    display: flex;
+    flex-direction: row;
+}
+.attendanceIndexDiv{
+    position: relative;
+    max-width: 100%;
+    max-height: 250px;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    /* gap: 450px; */
+    display: flex;
+    flex-direction: row;
+}
+/* login Form css */
+.loginForm {
+    background: #312f34;
+    opacity: 0.85;
+    position: relative;
+    width: 400px;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px -3px #333;
+    text-align: center;
+}
+
+.inputField {
+    border-radius: 100px;
+    padding: 10px 15px;
+    width: 60%;
+    border: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    background: #312f34;
     outline: none;
+    display: block;
+    margin: 20px auto 20px auto;
+}
+
+.signInButton {
+    border-radius: 100px;
+    border: none;
+    background: #312f34;
+    width: 60%;
+    padding: 10px;
+    color: #FFFFFF;
+    margin-top: 25px;
+    box-shadow: 0 2px 10px -3px #FFFFFF;
+    display: block;
+    margin: 55px auto 10px auto;
+}
+
+.loginAnchor {
+    text-align: center;
+    color: #FFFFFF;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.loginAnchor:hover {
+    color: #FFFFFF;
     text-decoration: underline;
-    color: blue;
-    cursor: pointer;
+}
+
+.AlreadyLoggedInText{
+    background-color: #312f34;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    color: #FFFFFF;
+}
+.redirectToIndex{
+    text-decoration: none;
+}
+.redirectToIndex:hover{
+    text-decoration: underline;
+}
+/* login Form css */
+
+.listingTable{
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.listingTable2{
+    border: 1px solid #a69cae;
+    width: 100%;
+    margin-bottom: 15rem;
+}
+.listingTable2 td{
+    border-bottom: 1px solid #a69cae;
+    color: #3f3c43;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 10px;
+}
+.listingTable2 th{
+    color: #3f3c43 !important;
+    text-align: left;
+    max-width: 250px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 10px;
 }

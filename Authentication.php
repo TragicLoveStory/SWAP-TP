@@ -111,6 +111,7 @@ function login($email,$password){
 				include "mailFunctions.php";
 				sendOTP($email);
 			}
+			session_destroy(); //destroy the session created at loginForm.php
 			attendanceCheck($row['ID']);
             printok("Login Successful");
 			session_set_cookie_params([
@@ -123,6 +124,7 @@ function login($email,$password){
 			]);
 			session_start();
 			if(isset($_COOKIE['PHPSESSID'])){
+				echo "THIS CONDITION";
 				echo $_COOKIE['PHPSESSID']."<br>Redundant cookie named PHPSESSID containing session ID to be removed.";
 				setcookie('PHPSESSID', "", time()-1*60*60, "/");
 				session_unset(); // remove/unset/free all session variables
