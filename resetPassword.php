@@ -18,18 +18,19 @@
         }
         $uri = $_SERVER['REQUEST_URI'];
         $fullUri = "http://localhost${uri}";
+        $errorMessage="";
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Reset Password"){
             if(!empty($_POST['resetPassword']) && !empty($_POST['confirmPassword'])){
                 if($_POST['resetPassword'] === $_POST['confirmPassword']){
                     require_once "mailFunctions.php";
-                    resetPassword($_GET['s'],$_POST['resetPassword']);
+                    resetPassword($_GET['s'],$_POST['resetPassword'],$_POST['confirmPassword']);
                 }
                 else{
-                    echo "Passwords do not match.";
+                    $errorMessage = "Passwords do not match.";
                 }
             }
             else{
-                echo "Error: No fields should be empty<br>";
+                $errorMessage = "Error: No fields should be empty";
             }
         }   
     ?>
@@ -38,11 +39,12 @@
             <p style="text-align: center; color: #FFFFFF;">Reset Password</p>
             <form action="<?= $fullUri ?>" method='post' style="text-align: center;">
                 <label for='resetPassword' style="color: #FFFFFF;">Please enter a new password:</label>
-                <input type='text' name='resetPassword' class="inputField">
+                <input type='password' name='resetPassword' class="inputField">
                 <label for='confirmPassword' style="color: #FFFFFF;">Confirm new password:</label>
-                <input type='text' name='confirmPassword' class="inputField">
+                <input type='password' name='confirmPassword' class="inputField">
                 <input type='submit' value='Reset Password' name='Submit' class="signInButton">
             </form>
+            <p style="color: #FFFFFF; text-align: center; margin-top: 1rem;"><?= $errorMessage ?></p>
         </div>
     </div>
 </body>

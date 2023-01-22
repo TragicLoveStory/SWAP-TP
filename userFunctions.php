@@ -69,35 +69,35 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	for($counter = 0; $counter < count($inputArray); $counter++){
 		if($counter == 2 || $counter == 3){
 			if(strlen($inputArray[$counter]) > 20){
-				echo $inputNames[$counter]." is too long!";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!</p>";
 				die();
 			}
 		}
 		elseif($counter == 4){
 			if(strlen($inputArray[$counter]) > 10){
-				echo $inputNames[$counter]." is wrong.";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." wrong format.</p>";
 				die();
 			}
 		}
 		elseif($counter == 5){
 			if(strlen($inputArray[$counter]) !== 8){
-				echo $inputNames[$counter]." number is incorrect!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." number is incorrect!</p>";
 				die();
 			}
 		}
 		elseif($counter == 6 || $counter == 7){
 			if(strlen($inputArray[$counter]) > 20){
-				echo $inputNames[$counter]." is too long!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!</p>";
 				die();
 			}
 		}
 		else{
 			if(strlen($inputArray[$counter]) > 30){
-				echo $inputNames[$counter]." is too long!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!</p>";
 				die();
 			}
 			elseif(strlen($inputArray[$counter]) < 10){
-				echo $inputNames[$counter]." is too Short!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too Short!</p>";
 				die();
 			}
 			else{
@@ -116,11 +116,8 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	$checkall=$checkall && inputChecker($department,"/^[A-Za-z\s]+$/"); //only allow letters
 	$checkall=$checkall && inputChecker($occupation,"/^[A-Za-z\s]+$/"); //only allow letters
 	if (!$checkall) {
-		echo "Error checking inputs<br>Please return to the registration form";
+		echo "<p class='AlreadyLoggedInText'>Error: Please check inputs.</p>";
 		die();
-	}
-	else{
-		echo "Validated";
 	}
 	// htmlspecialchars  (defence against XSS)
 	$sanitizedEmail = htmlspecialchars($email);
@@ -165,35 +162,35 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	for($counter = 0; $counter < count($inputArray); $counter++){
 		if($counter == 2 || $counter == 3){
 			if(strlen($inputArray[$counter]) > 20){
-				echo $inputNames[$counter]." is too long!";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!</p>";
 				die();
 			}
 		}
 		elseif($counter == 4){
 			if(strlen($inputArray[$counter]) > 10){
-				echo $inputNames[$counter]." is wrong.";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." wrong format.</p>";
 				die();
 			}
 		}
 		elseif($counter == 5){
 			if(strlen($inputArray[$counter]) !== 8){
-				echo $inputNames[$counter]." number is incorrect!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." number is incorrect!</p>";
 				die();
 			}
 		}
 		elseif($counter == 6 || $counter == 7){
 			if(strlen($inputArray[$counter]) > 20){
-				echo $inputNames[$counter]." is too long!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!</p>";
 				die();
 			}
 		}
 		else{
 			if(strlen($inputArray[$counter]) > 30){
-				echo $inputNames[$counter]." is too long!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!</p>";
 				die();
 			}
 			elseif(strlen($inputArray[$counter]) < 10){
-				echo $inputNames[$counter]." is too Short!<br>";
+				echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too Short!</p>";
 				die();
 			}
 			else{
@@ -213,7 +210,7 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	$checkall=$checkall && inputChecker($department,"/^[A-Za-z\s]+$/"); //only allow letters
 	$checkall=$checkall && inputChecker($occupation,"/^[A-Za-z\s]+$/"); //only allow letters
 	if (!$checkall) {
-		echo "Error checking inputs<br>Please return to the registration form";
+		echo "<p class='AlreadyLoggedInText'>Error: Please check inputs.</p>";
 		die();
 	}
 	else{

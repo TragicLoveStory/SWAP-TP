@@ -14,19 +14,6 @@ function debug() {
 	echo "</pre>";
 }
 
-if(isset($_POST['Submit']) && $_POST['Submit'] === "Sign in"){
-    if(!empty($_POST['username']) && !empty($_POST['password'])){
-        login($_POST['username'],$_POST['password']);
-    }
-    else{
-        echo "Error: No fields should be empty<br>";
-    }
-}
-
-if(isset($_POST['Submit2']) && $_POST['Submit2'] === "Sign Out"){
-    logout();
-}
-
 function attendanceCheck($ID){
 	require "config.php";
 
@@ -40,7 +27,6 @@ function attendanceCheck($ID){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
 	// check if attendance was already taken(first login of the day POST)
 	date_default_timezone_set('Singapore');
 	$date = date('Y-m-d', time());
@@ -51,7 +37,7 @@ function attendanceCheck($ID){
 	$result = $query-> get_result();
 	$row = $result -> fetch_assoc();
 	if ($row) {
-		echo "Attendance has already been taken today.";
+		//echo "Attendance has already been taken today.";
    	}
 	else{
 		$query2 = $con->prepare("INSERT INTO `attendance` (`userId`,`status`,`Date`) VALUES (?,?,?)"); //login to become present for attendance at work
@@ -82,7 +68,7 @@ function login($email,$password){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
 
     $query=$con->prepare("SELECT * from users WHERE `email`=?");
     $query->bind_param('s',$email);
@@ -91,7 +77,7 @@ function login($email,$password){
         $row = $result->fetch_assoc();
 		//htmlspecialchars the password input as we sanitized the password input before INSERT into database.
         if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || !password_verify($password,htmlspecialchars($row['password']))){
-            printerror("Wrong Login Credentials",$con);
+			//function fails, shows error message
         }
         else{
 			if($row['otp'] == 1){
@@ -112,9 +98,8 @@ function login($email,$password){
 				sendOTP($email);
 			}
 			session_destroy(); //destroy the session created at loginForm.php
-			attendanceCheck($row['ID']);
-            printok("Login Successful");
-			session_set_cookie_params([
+			attendanceCheck($row['ID']); // take attendance for that day
+			session_set_cookie_params([ 
 				'lifetime' => '86400',
 				'path' => '/SWAP-TP',
 				'domain' => '',
@@ -122,52 +107,33 @@ function login($email,$password){
 				'httponly' => TRUE,
 				'samesite' => 'Strict'
 			]);
-			session_start();
+			session_start(); //start session
 			if(isset($_COOKIE['PHPSESSID'])){
-				echo "THIS CONDITION";
-				echo $_COOKIE['PHPSESSID']."<br>Redundant cookie named PHPSESSID containing session ID to be removed.";
+				//echo $_COOKIE['PHPSESSID']."<br>Redundant cookie named PHPSESSID containing session ID to be removed.";
 				setcookie('PHPSESSID', "", time()-1*60*60, "/");
 				session_unset(); // remove/unset/free all session variables
 				session_destroy(); //destroy the session 
 
 				session_start(); //start a NEW session
 				session_regenerate_id(); //regenerate a new session ID because old one was destroyed
-				printok("Started session"); //creates/resumes session
+				//printok("Started session");
 				$_SESSION["ID"]=$row['ID'];
 				$_SESSION['email'] = $row['email']; 
 				$_SESSION["role"]=$row['role'];
 				$_SESSION["occupation"]=$row['occupation'];
 				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
-				printok("Added ID & role into _SESSION"); //acknowledgement
-				// setcookie("Department", $row['department'], [
-				// 	'expires' => time() + 86400,
-				// 	'path' => '/SWAP-TP',
-				// 	'domain' => '',
-				// 	'secure' => TRUE,
-				// 	'httponly' => TRUE,
-				// 	'samesite' => 'Strict'
-				// ]);
+				//printok("Added ID & role into _SESSION"); //acknowledgement
 			}
 			else{
 				//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
-				printok("Started session"); //creates/resumes session
 				$_SESSION["ID"]=$row['ID']; 
 				$_SESSION['email'] = $row['email']; 
 				$_SESSION["role"]=$row['role'];
 				$_SESSION["occupation"]=$row['occupation'];
 				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
-				printok("Added ID & role into _SESSION"); //acknowledgement
-				//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
-				// setcookie("Department", $row['department'], [
-				// 	'expires' => time() + 86400,
-				// 	'path' => '/SWAP-TP',
-				// 	'domain' => '',
-				// 	'secure' => TRUE,
-				// 	'httponly' => TRUE,
-				// 	'samesite' => 'Strict'
-				// ]);
+				//printok("Added ID & role into _SESSION"); //acknowledgement
 			}
 			if($_SESSION['status'] === -1){
 				header("Location: http://localhost/SWAP-TP/firstPassChange.php");
@@ -198,8 +164,8 @@ function logout(){
 }
 
 function firstPasswordChange($passwordInput,$confirmPasswordInput){
-	if($passwordInput !== $confirmPasswordInput){
-		echo "Passwords do not match.";
+	if($passwordInput != $confirmPasswordInput){
+		echo "<p class='AlreadyLoggedInText'>Passwords Do not match.</p>";
 		die();
 	}
 	require "config.php";
@@ -213,33 +179,25 @@ function firstPasswordChange($passwordInput,$confirmPasswordInput){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
 	// min & max length input validation
 	$inputArray = array($passwordInput,$confirmPasswordInput);
 	$inputNames = array('Password','Confirm Password');
 	for($counter = 0; $counter < count($inputArray); $counter++){
 		if(strlen($inputArray[$counter]) > 30){
-			echo $inputNames[$counter]." is too long!<br>";
+			echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too long!.</p>";
 			die();
 		}
 		elseif(strlen($inputArray[$counter]) < 10){
-			echo $inputNames[$counter]." is too Short!<br>";
+			echo "<p class='AlreadyLoggedInText'>".$inputNames[$counter]." is too short!.</p>";
 			die();
 		}
-		else{
-
-		}
 	}
-	// regular expressions + date checking
+	// regular expressions
 	$checkall = true;
-	$checkall=$checkall && inputChecker($passwordInput,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); 
-	$checkall=$checkall && inputChecker($confirmPasswordInput,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); //must have lower case, upper case, special char and number
+	$checkall=$checkall && inputChecker($passwordInput,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); //must have lower case, upper case, special char and number
 	if (!$checkall) {
-		echo "Error checking inputs<br>Please return to the registration form";
+		echo "<p class='AlreadyLoggedInText'>Incorrect Input. Must contain 1 Lowercase, Uppercase, Special Character, number and 10 characters long</p>";
 		die();
-	}
-	else{
-		echo "Validated";
 	}
 	// htmlspecialchars
 	$sanitizedPasswordInput = htmlspecialchars($passwordInput);
@@ -249,8 +207,6 @@ function firstPasswordChange($passwordInput,$confirmPasswordInput){
 	$query=$con->prepare("UPDATE `users` SET `password`=?, `status`=? WHERE `ID` = ?");
 	$query->bind_param('sii',$hashed_password, $newStatus, $_SESSION['ID']);
 	if($query->execute()){ //executing query (processes and print the results)
-		printok("Closing connection");
-		echo "Logging Out. Log back in.";
 		logout();
 	}
 	else{
@@ -302,7 +258,8 @@ function otpLogin($inputOTP){
         $row = $result->fetch_assoc();
 		//htmlspecialchars the password input as we sanitized the password input before INSERT into database.
         if(empty($row['email']) || $row['email'] !== $decryptedvalue){
-            printerror("Wrong Login Credentials",$con);
+            echo "<p class='AlreadyLoggedInText'>ERROR: Email and/or Password is incorrect.</p>";
+			die();
         }
         else{
 			attendanceCheck($row['ID']);
@@ -331,15 +288,6 @@ function otpLogin($inputOTP){
 				$_SESSION["occupation"]=$row['occupation'];
 				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
-				printok("Added ID & role into _SESSION"); //acknowledgement
-				// setcookie("Department", $row['department'], [
-				// 	'expires' => time() + 86400,
-				// 	'path' => '/SWAP-TP',
-				// 	'domain' => '',
-				// 	'secure' => TRUE,
-				// 	'httponly' => TRUE,
-				// 	'samesite' => 'Strict'
-				// ]);
 			}
 			else{
 				//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
@@ -350,16 +298,6 @@ function otpLogin($inputOTP){
 				$_SESSION["occupation"]=$row['occupation'];
 				$_SESSION["department"]=$row['department'];
 				$_SESSION["status"]=$row['status'];
-				printok("Added ID & role into _SESSION"); //acknowledgement
-				//setcookie("Department", $row['department'], time()+30*24*60*60, "/SWAP-TP", "",TRUE,TRUE); this is non strict (non same site only)
-				// setcookie("Department", $row['department'], [
-				// 	'expires' => time() + 86400,
-				// 	'path' => '/SWAP-TP',
-				// 	'domain' => '',
-				// 	'secure' => TRUE,
-				// 	'httponly' => TRUE,
-				// 	'samesite' => 'Strict'
-				// ]);
 			}
 			if($_SESSION['status'] === -1){
 				header("Location: http://localhost/SWAP-TP/firstPassChange.php");

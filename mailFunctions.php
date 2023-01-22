@@ -5,9 +5,11 @@ function contactMail($subject,$body){
     // $body = "Hi, there...This is a test email send from Localhost.";
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
-        echo "Email sent successfully to $receiver";
+        echo "<p class='AlreadyLoggedInText'>Email successfully sent to ".$receiver."</p>";
+        die();
     }else{
-        echo "Sorry, failed while sending mail!";
+        echo "<p class='AlreadyLoggedInText'>Error: failed while sending mail</p>";
+        die();
     }
 }
 
@@ -18,10 +20,10 @@ function forgotPassword($email){
     $body = "We received a request for a password change. Create a new password by clicking the link below.\r\nlocalhost/SWAP-TP/resetPassword.php?s=".$randomString;
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
-        echo "Email sent successfully to $receiver";
+        echo "<p class='AlreadyLoggedInText'>Email successfully sent to ".$receiver."</p>";
         insertString($randomString,$email);
     }else{
-        echo "Sorry, failed while sending mail!";
+        echo "<p class='AlreadyLoggedInText'>Error: failed while sending mail</p>";
     }
 }
 
@@ -68,7 +70,11 @@ function generateOTP() {
     return $randomString;
 }
 
-function resetPassword($randomString,$newPassword){
+function resetPassword($randomString,$newPassword,$confirmPassword){
+    if($confirmPassword !== $newPassword){
+        echo "<p class='AlreadyLoggedInText'>Passwords Do not match.</p>";
+		die();
+    }
     require "config.php";
     require "userFunctions.php";
     try {
@@ -89,7 +95,7 @@ function resetPassword($randomString,$newPassword){
     $result = $query-> get_result();
     $row = $result -> fetch_assoc();
     if(!$row){
-        echo "Error: Invalid Link.";
+        echo "<p class='AlreadyLoggedInText'>Error: Invalid link.</p>";
         die();
     }
     $currentTime = time();
@@ -99,7 +105,7 @@ function resetPassword($randomString,$newPassword){
         $query=$con->prepare("DELETE FROM `forgotpassword` WHERE `string`=?");
         $query->bind_param('s',$randomString);
         if($query->execute()){
-            echo "Error: Expired Link";
+            echo "<p class='AlreadyLoggedInText'>Error: Expired Link.</p>";
             die();
         }
     }
@@ -107,7 +113,7 @@ function resetPassword($randomString,$newPassword){
         $checkall = true;
         $checkall=$checkall && inputChecker($newPassword,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s]|.*[_])).{10,29}$/");
         if (!$checkall) {
-            echo "Password requires at least:\r\n 1 Capital Letter\r\n 1 Special Character\r\n 1 number\r\n10 characters long";
+            echo "<p class='AlreadyLoggedInText'>Password requires at least:\r\n 1 Capital Letter\r\n 1 Special Character\r\n 1 number\r\n10 characters long</p>";
             die();
         }
         $sanitizedPassword = htmlspecialchars($newPassword);
@@ -119,7 +125,7 @@ function resetPassword($randomString,$newPassword){
             $query3=$con->prepare("DELETE FROM `forgotpassword` WHERE `string`=?");
             $query3->bind_param('s',$randomString);
             if($query3->execute()){
-                echo "Password has been reset successfully.";
+                header("Location: http://localhost/SWAP-TP/loginForm.php");
                 die();
             }
         }
@@ -135,7 +141,7 @@ function sendOTP($email){
     $body = "Hello ".$email.", as OTP is enabled for your TPAMC account, we have sent an OTP for your recent login attempt below.\r\n".$generatedOTP;
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
-        echo "Email sent successfully to $receiver";
+        //echo "Email sent successfully to $receiver";
         $key = "erioepb834759-0324523u45htyiow45hjiopwjh-90et0-239456";
         $initializationIV = "";
         $AES128_ECB="aes-128-ecb";

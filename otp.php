@@ -16,17 +16,22 @@
         echo "Access Forbidden.";
         die();
      }
+    $errorMessage = "";
     $key = "erioepb834759-0324523u45htyiow45hjiopwjh-90et0-239456";
     $initializationIV = "";
     $AES128_ECB="aes-128-ecb";
     $decryptedvalue = openssl_decrypt($_COOKIE['nali'], $AES128_ECB, $key, $options=0, $initializationIV);
      if(isset($_POST['Submit']) && $_POST['Submit'] === "Submit OTP"){
-        if(strlen($_POST['otpInput']) != 6){
-            echo "Error";
-            die();
+        if(!empty($_POST['otpInput'])){
+            if(strlen($_POST['otpInput']) !== 6){
+                $errorMessage = "Invalid OTP.";
+            }
+            elseif($_POST['otpInput'] === $decryptedvalue){
+                otpLogin($_POST['otpInput']);
+            }
         }
-        elseif($_POST['otpInput'] === $decryptedvalue){
-            otpLogin($_POST['otpInput']);
+        else{
+            $errorMessage =  "Error: Empty Field";
         }
     }
     ?>
@@ -36,6 +41,7 @@
                 <input type="text" name="otpInput" placeholder="Enter OTP Here" class="inputField">
                 <input type="submit" value="Submit OTP" name="Submit" class="signInButton">
             </form>
+            <p style="color: #FFFFFF; text-align: center; margin-top: 1rem;"><?= $errorMessage ?></p>
         </div>
     </div>
 </body>

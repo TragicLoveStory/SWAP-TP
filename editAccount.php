@@ -5,38 +5,46 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
 <?php 
-        session_start();
-        require "config.php";
-        require "userfunctions.php";
-        if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="USER-ADMIN"){
-            echo "Only permitted for User Admins.";
-            die();
+    session_start();
+    require "config.php";
+    require "userfunctions.php";
+    if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="USER-ADMIN"){
+        echo "Only permitted for User Admins.";
+        die();
+    } 
+    elseif(!isset($_GET['editing']) || $_GET['editing'] != "true"){
+        echo "Error.";
+        die();
+    }
+
+    if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Account"){
+        if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
+            //echo "No fields are empty<br>";
+            edituser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation']);
         } 
-        elseif(!isset($_GET['editing']) || $_GET['editing'] != "true"){
-            echo "Error.";
+        else{
+            echo "Error: No fields should be empty<br>";
+        }
+    }
+    
+    try {
+        $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+        }
+        catch (Exception $e) {
+            printerror($e->getMessage(),$con);
+        }
+        if (!$con) {
+            printerror("Connecting to $db_hostname", $con);
             die();
         }
-
-        try {
-            $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
-            }
-            catch (Exception $e) {
-                printerror($e->getMessage(),$con);
-            }
-            if (!$con) {
-                printerror("Connecting to $db_hostname", $con);
-                die();
-            }
-            else printok("Connecting to $db_hostname");
         $uri = $_SERVER['REQUEST_URI'];
         $fullUri = "http://localhost${uri}";
-        require_once "userFunctions.php";
-        require_once "config.php";
-
         if(isset($_GET['editing']) && $_GET['editing']==="true"){
             $query=$con->prepare("SELECT * FROM `users` WHERE `ID` =?");
             $query->bind_param('i', $_SESSION['editUserId']); //bind the parameters
@@ -44,16 +52,6 @@
             $result = $query-> get_result();
             $row = $result -> fetch_assoc();
         }  
-
-        if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit Account"){
-            if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
-                //echo "No fields are empty<br>";
-                edituser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'],$_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation']);
-            } 
-            else{
-                echo "Error: No fields should be empty<br>";
-            }
-        }
     ?>
 
     <form action="<?= $fullUri ?>" method='post'>
@@ -107,9 +105,8 @@
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+<!-- Include every Bootstrap JavaScript plugin and dependency  -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://www.w3schools.com/lib/w3.js"></script> <!-- Include EVERY OTHER HTML Files to this file-->
 <script>
     //to bring in other HTML on the fly into this page

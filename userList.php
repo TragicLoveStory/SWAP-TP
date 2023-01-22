@@ -45,7 +45,7 @@
         $query->execute();
         $result = $query-> get_result();
         echo "<div class='container listingTable'>
-        <p>Users table containing employee accounts from all departments. Edit user details whenever necessary. Please contact <i>tpamcIT@tp.edu.sg</i> or any IT staff for any inquiries.</p>
+        <p>Users table containing employee accounts from all departments. Edit user details whenever necessary. Please contact <i>tpamcIT@tp.edu.sg</i> or any IT staff for any inquiries.<br>To create new users, click <a href='registerAccount.php'>here</a>:</p>
         <table class='listingTable2'>
             <tr><th>User ID</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th><th>Status</th><th>About me</th><th>Profile Pic</th><th>OTP</th><th>Edit</th><th>Delete</th></tr>";
         while($row = $result -> fetch_assoc()){

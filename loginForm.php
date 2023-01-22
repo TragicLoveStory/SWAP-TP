@@ -13,17 +13,26 @@
     session_start();
     require "config.php";
     require "Authentication.php";
+    $errorMessage = "";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Sign in"){
         if(!empty($_POST['username']) && !empty($_POST['password'])){
-            login($_POST['username'],$_POST['password']);
+            if(login($_POST['username'],$_POST['password'])){
+            }
+            else{
+                $errorMessage = "Email and/or Password is incorrect!";
+            }
+        }
+        else{
+            $errorMessage = "No fields must be empty!";
         }
     }
      if (isset($_SESSION["ID"]) && isset($_SESSION["role"])){
         echo '<p class="AlreadyLoggedInText">Already logged in. What are you here for? redirect <a href="index.php" class="redirectToIndex">here</a></p>';
         die();
      }
-     else{
-        echo '<div class="container"><div class="loginForm">
+    ?>
+    <div class="container">
+        <div class="loginForm">
             <form method="post" action="loginForm.php">
                 <input type="text" name="username" placeholder="Username" class="inputField">
                 <input type="password" name="password" placeholder="Password" class="inputField">
@@ -31,9 +40,9 @@
             </form>
             <hr>
             <a href="forgotPassword.php" class="loginAnchor">Forgot Password?</a>
-            </div></div>';
-     }
-    ?>
+            <p style="color: #FFFFFF; text-align: center; margin-top: 1rem;"><?= $errorMessage ?></p>
+        </div>
+    </div>
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

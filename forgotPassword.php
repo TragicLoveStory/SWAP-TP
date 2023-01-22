@@ -11,13 +11,14 @@
 <body class="backgroundImage">
     <?php 
         require "config.php";
+        $errorMessage="";
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Reset Password"){
             if(!empty($_POST['forgotPassword'])){
                 require_once "mailFunctions.php";
                 forgotPassword($_POST['forgotPassword']);
             }
             else{
-                echo "Error: No fields should be empty<br>";
+                $errorMessage = "Error: No fields should be empty<br>";
             }
         }   
     ?>
@@ -29,6 +30,7 @@
                 <input type='text' name='forgotPassword' class="inputField">
                 <input type='submit' value='Reset Password' name='Submit' class="signInButton">
             </form>
+            <p style="color: #FFFFFF; text-align: center; margin-top: 1rem;"><?= $errorMessage ?></p>
         </div>
     </div>
 </body>

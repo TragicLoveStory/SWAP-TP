@@ -1,5 +1,5 @@
 .backgroundImage{
-    background-image: url('Images/amc1.jpg');
+    background-image: url('Images/amc1edit.jpg');
     background-size: cover;
 }
 .backgroundColor{
@@ -68,6 +68,7 @@
     display: flex;
     flex-direction: row;
 }
+
 /* login Form css */
 .loginForm {
     background: #312f34;
@@ -133,6 +134,19 @@
 }
 .redirectToIndex:hover{
     text-decoration: underline;
+}
+.textareaField{
+    width: 100%;
+}
+.contactSubjectField{
+    padding: 10px 15px;
+    width: 100%;
+    border: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    background: #312f34;
+    outline: none;
+    display: block;
+    margin: 20px auto 20px auto;
 }
 /* login Form css */
 
