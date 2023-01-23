@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Document</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
-    <?php 
+    <?php
         session_start();
+
         if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
             echo "Must be logged in.";
             die();
         }
+
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Thread"){
             if(!empty($_POST['title']) && !empty($_POST['content'])){
                 require_once "forumFunctions.php";
@@ -23,8 +26,11 @@
                 echo "Error: No fields should be empty<br>";
             }
         }
+
     ?>
+
     <form action="createThread.php" method='post'>
+
     <table style='text-align: left; margin-left: auto; margin-right: auto;'>
     <tr>
         <th></th>
