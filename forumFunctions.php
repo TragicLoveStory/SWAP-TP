@@ -16,7 +16,7 @@ function deleteThread($forumID) {
     $query=$con->prepare("DELETE FROM `forum` WHERE `id`=?");
     $query->bind_param('i', $forumID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/Forum.php");
+        header("Location: https://localhost/SWAP-TP/Forum.php");
         die();
     }
     else{
@@ -49,7 +49,7 @@ function archiveThread($archiveStatus,$forumID) {
     $query=$con->prepare("UPDATE forum SET `status`=? WHERE `id`=?");
     $query->bind_param('ii', $threadStatus,$forumID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/Forum.php");
+        header("Location: https://localhost/SWAP-TP/Forum.php");
         die();
     }
     else{
@@ -77,7 +77,7 @@ function createThread($title,$content){
     $query=$con->prepare("INSERT INTO forum (`userId`,`title`,`content`) VALUES (?,?,?)");
 	$query->bind_param('iss', $_SESSION['ID'], $sanitizedTitle, $sanitizedContent);
 	if($query->execute()){ //executing query (processes and print the results)
-		header("Location: http://localhost/SWAP-TP/Forum.php");
+		header("Location: https://localhost/SWAP-TP/Forum.php");
 		die();
 	}
 	else{
@@ -133,7 +133,7 @@ function editThread($title,$content,$forumID){
 	$query->bind_param('sssi', $sanitizedTitle,$sanitizedContent,$date,$forumID);
 	if($query->execute()){ //executing query (processes and print the results)
         unset($_SESSION['forumID']);
-        header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=$forumID");
+        header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=$forumID");
         die();
 	}
 	else{
@@ -162,7 +162,7 @@ function createComment($comment){
 	$query->bind_param('iis', $_SESSION['ID'], $_SESSION['forumId'], $sanitizedComment);
 	if($query->execute()){ //executing query (processes and print the results)
         unset($_SESSION["forumId"]);
-		header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumId);
+		header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumId);
 		die();
 	}
 	else{
@@ -189,7 +189,7 @@ function editComment($comment,$commentID,$forumId){
 	$query->bind_param('si', $sanitizedComment, $commentID);
 	if($query->execute()){ //executing query (processes and print the results)
         unset($_SESSION["commentId"]);
-		header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumId);
+		header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumId);
 		die();
 	}
 	else{
@@ -213,7 +213,7 @@ function deleteComment($commentID,$forumID){
     $query=$con->prepare("DELETE FROM `comments` WHERE `ID`=?");
     $query->bind_param('i', $commentID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+        header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
         die();
     }
     else{
@@ -247,7 +247,7 @@ function likeComment($commentID,$forumID){
                 $query2=$con->prepare("DELETE FROM `commentlikes` WHERE `commentId` = ? AND `userId` = ?");
                 $query2->bind_param('ii', $commentID, $_SESSION['ID']);
                 if($query2->execute()){
-                    header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+                    header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
                     die();
                 }
             }
@@ -257,7 +257,7 @@ function likeComment($commentID,$forumID){
                 $query3=$con->prepare("UPDATE `commentlikes` SET `status`=? WHERE `commentId` = ? AND `userId` = ?");
                 $query3->bind_param('iii', $liking, $commentID, $_SESSION['ID']);
                 if($query3->execute()){
-                    header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+                    header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
                     die();
                 }
             }
@@ -268,7 +268,7 @@ function likeComment($commentID,$forumID){
             $query4=$con->prepare("INSERT INTO `commentlikes` (`commentId`,`userId`,`status`) VALUES (?,?,?)");
             $query4->bind_param('iii', $commentID, $_SESSION['ID'], $liking);
             if($query4->execute()){
-                header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+                header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
                 die();
             }
         }
@@ -303,7 +303,7 @@ function dislikeComment($commentID,$forumID){
                 $query2=$con->prepare("DELETE FROM `commentlikes` WHERE `commentId` = ? AND `userId` = ?");
                 $query2->bind_param('ii', $commentID, $_SESSION['ID']);
                 if($query2->execute()){
-                    header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+                    header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
                     die();
                 }
             }
@@ -311,7 +311,7 @@ function dislikeComment($commentID,$forumID){
             $query3=$con->prepare("UPDATE `commentlikes` SET `status`=? WHERE `commentId` = ? AND `userId` = ?");
             $query3->bind_param('iii', $disliking, $commentID, $_SESSION['ID']);
             if($query3->execute()){
-                header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+                header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
                 die();
             }
         }
@@ -320,7 +320,7 @@ function dislikeComment($commentID,$forumID){
             $query4=$con->prepare("INSERT INTO `commentlikes` (`commentId`,`userId`,`status`) VALUES (?,?,?)");
             $query4->bind_param('iii', $commentID, $_SESSION['ID'], $disliking);
             if($query4->execute()){
-                header("Location: http://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
+                header("Location: https://localhost/SWAP-TP/forumThread.php?forumID=".$forumID);
                 die();
             }
         }

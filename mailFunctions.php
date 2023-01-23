@@ -125,7 +125,7 @@ function resetPassword($randomString,$newPassword,$confirmPassword){
             $query3=$con->prepare("DELETE FROM `forgotpassword` WHERE `string`=?");
             $query3->bind_param('s',$randomString);
             if($query3->execute()){
-                header("Location: http://localhost/SWAP-TP/loginForm.php");
+                header("Location: https://localhost/SWAP-TP/loginForm.php");
                 die();
             }
         }
@@ -154,7 +154,7 @@ function sendOTP($email){
             'httponly' => TRUE,
             'samesite' => 'Strict'
         ]);
-        header("Location: http://localhost/SWAP-TP/otp.php");
+        header("Location: https://localhost/SWAP-TP/otp.php");
         die();
     }else{
         echo "Sorry, failed while sending mail!";

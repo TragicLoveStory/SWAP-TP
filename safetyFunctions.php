@@ -20,7 +20,7 @@ function createSafetyThread($title,$content,$videoLink){
     $query=$con->prepare("INSERT INTO workplacesafety (`safetyTitle`,`safetyContent`,`videoLink`) VALUES (?,?,?)");
 	$query->bind_param('sss',$sanitizedTitle, $sanitizedContent, $sanitizedVideoLink);
 	if($query->execute()){ //executing query (processes and print the results)
-		header("Location: http://localhost/SWAP-TP/Safety.php");
+		header("Location: https://localhost/SWAP-TP/Safety.php");
 		die();
 	}
 	else{
@@ -52,7 +52,7 @@ function editSafetyThread($title,$content,$videoLink){
 	$query->bind_param('ssssi', $sanitizedTitle,$sanitizedContent,$sanitizedVideoLink,$date,$_SESSION['safetyID']);
 	if($query->execute()){ //executing query (processes and print the results)
 		unset($_SESSION['safetyID']);
-        header("Location: http://localhost/SWAP-TP/Safety.php");
+        header("Location: https://localhost/SWAP-TP/Safety.php");
         die();
 	}
 	else{
@@ -76,7 +76,7 @@ function deleteSafety($safetyID){
     $query=$con->prepare("DELETE FROM `workplacesafety` WHERE `id`=?");
     $query->bind_param('i', $safetyID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/Safety.php");
+        header("Location: https://localhost/SWAP-TP/Safety.php");
         die();
     }
     else{

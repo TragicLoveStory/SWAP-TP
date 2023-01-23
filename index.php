@@ -16,7 +16,7 @@
     require "config.php";
     require "userfunctions.php";
     if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
-        header("Location: http://localhost/SWAP-TP/loginForm.php");
+        header("Location: https://localhost/SWAP-TP/loginForm.php");
         die();
     }
     try {

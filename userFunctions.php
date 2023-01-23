@@ -133,7 +133,7 @@ function adduser($email, $password,$firstname, $lastname, $dateofbirth, $contact
 	$query=$con->prepare("INSERT INTO users (`email`,`password`,`first_name`,`last_name`,`date_of_birth`,`contact`,`department`,`occupation`) VALUES (?,?,?,?,?,?,?,?)");
 	$query->bind_param('sssssiss', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$sanitizedOccupation);
 	if($query->execute()){ //executing query (processes and print the results)
-		header("Location: http://localhost/SWAP-TP/userList.php");
+		header("Location: https://localhost/SWAP-TP/userList.php");
 		die();
 	}
 	else{
@@ -231,7 +231,7 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	$query->bind_param('sssssissi', $sanitizedEmail, $hashed_password, $sanitizedFirstName, $sanitizedLastName, $sanitizedDateOfBirth, $sanitizedContact, $sanitizedDepartment,$sanitizedOccupation,$_SESSION['editUserId']);
 	if($query->execute()){ //executing query (processes and print the results)
 		unset($_SESSION['editUserId']);
-		header("Location: http://localhost/SWAP-TP/userList.php");
+		header("Location: https://localhost/SWAP-TP/userList.php");
 		die();
 	}
 	else{
@@ -255,7 +255,7 @@ function deleteItem($userId) {
 	$query=$con->prepare("DELETE FROM `users` WHERE `ID`=?");
 	$query->bind_param('s', $userId); //bind the parameters
 	if($query->execute()){ //executing query (processes and print the results)
-		header("Location: http://localhost/SWAP-TP/userList.php");
+		header("Location: https://localhost/SWAP-TP/userList.php");
 		die();
 	}
 	else{
@@ -361,7 +361,7 @@ function editProfile($firstName,$lastName,$contactNumber,$aboutMe){
 	$query=$con->prepare("UPDATE `users` SET `first_name`=?, `last_name`=?, `contact`=?, `aboutMe`=? WHERE `ID` = ?");
 	$query->bind_param('ssisi', $sanitizedFirstName, $sanitizedLastName, $sanitizedContact, $sanitizedAboutMe, $_SESSION['ID']);
 	if($query->execute()){ //executing query (processes and print the results)
-		header("Location: http://localhost/SWAP-TP/profile.php");
+		header("Location: https://localhost/SWAP-TP/profile.php");
 		die();
 	}
 	else{

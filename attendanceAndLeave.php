@@ -23,14 +23,14 @@
     if (isset($_POST['editLeave']) && $_POST['editLeave'] == "Edit"){
         if(!empty($_POST['editLeaveID'])){
             $_SESSION['leaveID'] = $_POST['editLeaveID'];
-            header("Location: http://localhost/SWAP-TP/editLeave.php?leaveEditing=true");
+            header("Location: https://localhost/SWAP-TP/editLeave.php?leaveEditing=true");
             die();
         }
     }
     if (isset($_POST['editMC']) && $_POST['editMC'] == "Edit"){
         if(!empty($_POST['editMcID'])){
             $_SESSION['MCID'] = $_POST['editMcID'];
-            header("Location: http://localhost/SWAP-TP/editMc.php?mcEditing=true");
+            header("Location: https://localhost/SWAP-TP/editMc.php?mcEditing=true");
             die();
         }
     }

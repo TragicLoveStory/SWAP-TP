@@ -136,11 +136,11 @@ function login($email,$password){
 				//printok("Added ID & role into _SESSION"); //acknowledgement
 			}
 			if($_SESSION['status'] === -1){
-				header("Location: http://localhost/SWAP-TP/firstPassChange.php");
+				header("Location: https://localhost/SWAP-TP/firstPassChange.php");
 				die();
 			}
 			else{
-				header("Location: http://localhost/SWAP-TP/index.php");
+				header("Location: https://localhost/SWAP-TP/index.php");
 				die();
 			}
         }
@@ -300,11 +300,11 @@ function otpLogin($inputOTP){
 				$_SESSION["status"]=$row['status'];
 			}
 			if($_SESSION['status'] === -1){
-				header("Location: http://localhost/SWAP-TP/firstPassChange.php");
+				header("Location: https://localhost/SWAP-TP/firstPassChange.php");
 				die();
 			}
 			else{
-				header("Location: http://localhost/SWAP-TP/index.php");
+				header("Location: https://localhost/SWAP-TP/index.php");
 				die();
 			}
         }

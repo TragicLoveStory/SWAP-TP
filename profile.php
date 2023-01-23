@@ -18,7 +18,7 @@
         } 
 
         if(isset($_POST['editProfile']) && $_POST['editProfile'] === "Edit Profile"){
-            header("Location: http://localhost/SWAP-TP/editProfile.php");
+            header("Location: https://localhost/SWAP-TP/editProfile.php");
 		    die();
         }
         if(isset($_POST['logout']) && $_POST['logout'] === "Logout"){
@@ -42,9 +42,6 @@
                 printerror("Connecting to $db_hostname", $con);
                 die();
             }
-            //else printok("Connecting to $db_hostname");
-        // $uri = $_SERVER['REQUEST_URI'];
-        // $fullUri = "http://localhost${uri}";
         $query=$con->prepare("SELECT * FROM `users` WHERE `ID` =?");
         $query->bind_param('i', $_SESSION['ID']); //bind the parameters
         if($query->execute()){
@@ -62,12 +59,31 @@
         }
     ?>
     <div class="container" style="display: flex; flex-direction: column; align-items:center;">
-        <p style="text-align: center;">Email: <?= $row['email']; ?></p>
-        <p style="text-align: center;">Name: <?= $row['first_name']." ".$row['last_name']; ?></p>
-        <p style="text-align: center;">Date Of Birth: <?= $row['date_of_birth'] ?></p>
-        <p style="text-align: center;">Contact Number: <?= $row['contact'] ?></p>
-        <p style="text-align: center;">About me: <?= $row['aboutMe'] ?></p>
         <img src="<?= $row['profilePic'] ?>" alt="Profile Picture" style="object-fit: cover; width: 150px; height: 150px; border-radius: 50%; border: 1.5px solid #656065; margin-bottom: 3%">
+        <p>Email: <?= $row['email']; ?></p>
+        <p>Name: <?= $row['first_name']." ".$row['last_name']; ?></p>
+        <p>Date Of Birth: <?= $row['date_of_birth'] ?></p>
+        <p>Contact Number: <?= $row['contact'] ?></p>
+        <p>About me: <?= $row['aboutMe'] ?></p>
+        <?php if($row['occupation'] == "MANAGER" && $row['role'] != "LEAVE-ADMIN") : ?>
+            <p>Occupation: Manager</p> 
+            <a href='authoriseLeave.php'>Authorise Leave & MC requests here</a>
+        <?php endif; ?>
+
+        <?php if($row['role'] == "USER-ADMIN") : ?> 
+            <p>Role: User Admin</p> 
+            <a href='userList.php'>Manage user accounts here:</a>
+        <?php elseif($row['role'] == "FORUM-ADMIN") : ?> 
+            <p>Role: Forum Admin</p>
+            <a href='Forum.php'>Manage forum threads & comments here:</a>
+            <a href='Safety.php'>Manage workplace safety contents here:</a>
+        <?php elseif($row['role'] == "LEAVE-ADMIN") : ?> 
+            <p>Role: Leave Admin</p>
+            <a href='mcList.php'>View All medical certificates submitted here:</a>
+            <a href='leaveList.php'>View All leave requests submitted here:</a>
+            <a href='authoriseLeave.php'>Authorise Leave & MC requests here</a>
+        <?php endif; ?>
+
         <form action="profile.php" method="POST" style="text-align: center;">
             <input type="submit" name="editProfile" value="Edit Profile"><br><br>
         </form>

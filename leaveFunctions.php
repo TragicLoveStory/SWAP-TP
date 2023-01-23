@@ -97,7 +97,7 @@ function deleteMC($mcID){
     $result = $query-> get_result();
     $row = $result -> fetch_assoc();
     if(!$row){
-        header("Location: http://localhost/SWAP-TP/mcList.php");
+        header("Location: https://localhost/SWAP-TP/mcList.php");
         die();
     }
     else{
@@ -106,7 +106,7 @@ function deleteMC($mcID){
         $query2=$con->prepare("DELETE FROM `medicalcertificate` WHERE `id`=?");
         $query2->bind_param('i', $mcID); //bind the parameters
         if($query2->execute()){ //executing query (processes and print the results)
-            header("Location: http://localhost/SWAP-TP/mcList.php");
+            header("Location: https://localhost/SWAP-TP/mcList.php");
             die();
         }
         else{
@@ -171,7 +171,7 @@ function deleteLeave($leaveID){
     $query1=$con->prepare("DELETE FROM `workleave` WHERE `id`=?");
     $query1->bind_param('i', $leaveID); //bind the parameters
     if($query1->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/leaveList.php");
+        header("Location: https://localhost/SWAP-TP/leaveList.php");
         die();
     }
     else{
@@ -196,7 +196,7 @@ function denyLeaveRequest($leaveID){
     $query=$con->prepare("UPDATE workleave SET `status`=? WHERE `id`=?");
     $query->bind_param('ii',$deniedStatus, $leaveID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/authoriseLeave.php");
+        header("Location: https://localhost/SWAP-TP/authoriseLeave.php");
         die();
     }
     else{
@@ -221,7 +221,7 @@ function denyMcRequest($MCID){
     $query=$con->prepare("UPDATE medicalcertificate SET `status`=? WHERE `id`=?");
     $query->bind_param('ii',$deniedStatus, $MCID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/authoriseLeave.php");
+        header("Location: https://localhost/SWAP-TP/authoriseLeave.php");
         die();
     }
     else{
@@ -282,7 +282,7 @@ function approveLeaveRequest($leaveID,$userID,$startDate,$endDate,$totalDays){
                 }
             }     
         }
-        header("Location: http://localhost/SWAP-TP/authoriseLeave.php");
+        header("Location: https://localhost/SWAP-TP/authoriseLeave.php");
         die();
     }
     else{
@@ -343,7 +343,7 @@ function approveMcRequest($MCID,$userID,$startDate,$endDate,$totalDays){
                 }
             }     
         }
-        header("Location: http://localhost/SWAP-TP/authoriseLeave.php");
+        header("Location: https://localhost/SWAP-TP/authoriseLeave.php");
         die();
     }
     else{
@@ -367,7 +367,7 @@ function deleteLeaveRequest($leaveID){
     $query1=$con->prepare("DELETE FROM `workleave` WHERE `id`=?");
     $query1->bind_param('i', $leaveID); //bind the parameters
     if($query1->execute()){ //executing query (processes and print the results)
-        header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+        header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
         die();
     }
     else{
@@ -395,7 +395,7 @@ function deleteMcRequest($MCID){
         $row = $result -> fetch_assoc();
         if(!$row){
             echo "Error.";
-            header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+            header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
             die();
         }
         else{
@@ -404,7 +404,7 @@ function deleteMcRequest($MCID){
             $query2=$con->prepare("DELETE FROM `medicalcertificate` WHERE `id`=?");
             $query2->bind_param('i', $MCID); //bind the parameters
             if($query2->execute()){ //executing query (processes and print the results)
-                header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+                header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
                 die();
             }
             else{
@@ -485,7 +485,7 @@ function editMC($days,$startDate,$endDate){
             $query2=$con->prepare("UPDATE medicalcertificate SET `mcFile`=?,`Days`=?, `startDate`=?, `endDate`=? WHERE `id`=?");
             $query2->bind_param('sissi',$target_file,$days,$startDate,$endDate,$_SESSION['MCID']);
             if($query2->execute()){ //executing query (processes and print the results)
-                header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+                header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
                 die();
             }
             else{
@@ -529,7 +529,7 @@ function editLeave($days,$startDate,$endDate,$reason){
     $query->bind_param('isssi',$days,$startDate,$endDate,$reason,$_SESSION['leaveID']);
     if($query->execute()){ //executing query (processes and print the results)
         unset($_SESSION['leaveID']);
-        header("Location: http://localhost/SWAP-TP/attendanceAndLeave.php");
+        header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
         die();
     }
     else{

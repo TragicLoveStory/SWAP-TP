@@ -44,7 +44,7 @@
         }
         if (isset($_POST['editing']) && $_POST['editing'] === 'Edit'){
             $_SESSION['forumID'] = $_GET['forumID'];
-            header("Location: http://localhost/SWAP-TP/editThread.php?editing=true");
+            header("Location: https://localhost/SWAP-TP/editThread.php?editing=true");
             die();
         }
 
@@ -92,13 +92,13 @@
     <?php 
      if(isset($_POST['commentSubmit']) && $_POST['commentSubmit']=== "Create Comment"){
         $_SESSION['forumId'] = $_GET['forumID'];
-        header("Location: http://localhost/SWAP-TP/createComment.php");
+        header("Location: https://localhost/SWAP-TP/createComment.php");
         die();
     }
 
     if (isset($_POST['editingComment']) && $_POST['editingComment'] === 'Edit') {
         $_SESSION['commentId'] = $_POST['editCommentID'];
-        header("Location: http://localhost/SWAP-TP/editComment.php?editingComment=true");
+        header("Location: https://localhost/SWAP-TP/editComment.php?editingComment=true");
         die();
     }
 

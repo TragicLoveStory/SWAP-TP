@@ -20,7 +20,7 @@
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] !== "FORUM-ADMIN"){
         if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
-            header("Location: http://localhost/SWAP-TP/createThread.php");
+            header("Location: https://localhost/SWAP-TP/createThread.php");
             die();
         }
         include "navbar.php";
@@ -94,7 +94,7 @@
             }
         }
         if(isset($_POST['createForumPost']) && $_POST['createForumPost']=== "Create a forum post"){
-            header("Location: http://localhost/SWAP-TP/createThread.php");
+            header("Location: https://localhost/SWAP-TP/createThread.php");
             die();
         }
         echo '<form action="Forum.php" method="POST"><input type="submit" value="Create a forum post" name="createForumPost"></form>';

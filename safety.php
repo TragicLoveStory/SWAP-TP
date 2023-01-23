@@ -21,7 +21,7 @@
         }
         if (isset($_POST['editing']) && $_POST['editing'] === 'Edit') {
             $_SESSION['safetyID'] = $_POST['editSafetyID'];
-            header("Location: http://localhost/SWAP-TP/editSafety.php?editingSafety=true");
+            header("Location: https://localhost/SWAP-TP/editSafety.php?editingSafety=true");
             die();
         }
 
