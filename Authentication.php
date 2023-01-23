@@ -54,7 +54,7 @@ function attendanceCheck($ID){
 	}	
 }
 
-function login($email,$password){
+function login($email,$password,$recaptcha){
     require "config.php";
     require "userFunctions.php";
 	date_default_timezone_set('Singapore');
@@ -80,6 +80,22 @@ function login($email,$password){
 			//function fails, shows error message
         }
         else{
+			$secret_key = '6Lc9GR0kAAAAAOuYLevKn3oYBIErSwwKb70Wr3up';
+			// Hitting request to the URL, Google will
+    		// respond with success or error scenario
+			$url= 'https://www.google.com/recaptcha/api/siteverify?secret='.$secret_key.'&response='.$recaptcha;
+			// Making request to verify captcha
+			$response = file_get_contents($url);
+			// Response return by google is in
+			// JSON format, so we have to parse
+			// that json
+			$response = json_decode($response);
+			// Checking if response is true or not
+			if ($response->success == false) {
+				echo "<p class='AlreadyLoggedInText'>Captcha Failure.</p>";
+				die();
+			} 
+
 			if($row['otp'] == 1){
 				$key = "82734ywehfgagjlwenfgwuipth2498579efgo29835yrehgjkreng";
 				$initializationIV = "";
@@ -159,7 +175,7 @@ function logout(){
 	}
 	session_unset();
 	session_destroy();
-	header("Location: http://localhost/SWAP-TP/loginForm.php");
+	header("Location: https://localhost/SWAP-TP/loginForm.php");
 	die();
 }
 

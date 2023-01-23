@@ -37,24 +37,23 @@
       //else printok("Connecting to $db_hostname");
       include 'navbar.php';
       // loading of user details
-      $query = $con->prepare("select `id`,`userId`,`Days`,`Reason`,`timeOfSubmission`,`status`from workleave");
+      $query = $con->prepare("select `id`,`userId`,`Days`,`startDate`,`endDate`,`Reason`,`timeOfSubmission`,`status`from workleave");
       $query->execute();
-      $query->bind_result($id, $userId, $Days, $Reason, $timeOfSubmission, $status);
       $result = $query->get_result();
-      //echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
-      //echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
       echo "<div class ='container listingTable'>
-        <p>Table that contains the application for leaves by employees and to list whether leave is approved.</p>
+        <p style='margin-bottom: 5rem;'>Table that contains all leave requests submitted, delete whenever necessary.<br>Please contact <i>tpamcIT@tp.edu.sg</i> or any IT staff for any inquiries.</p>
         <table class='listingTable2'>
-            <tr><th> Leave ID</th><th>User ID</th><th>Number of Days</th><th>Reason for Leave</th><th>Time of Submission</th><th>Status</th><th>Delete</th></tr>";
+            <tr><th> Leave ID</th><th>User ID</th><th>Number of Days</th><th>Start Date</th><th>End Date</th><th>Reason for Leave</th><th>Time of Submission</th><th>Status</th><th>Delete</th></tr>";
       while ($row = $result->fetch_assoc()) {
         $id = $row['id'];
         $userId = $row['userId'];
         $Days = $row['Days'];
+        $startDate = $row['startDate'];
+        $endDate = $row['endDate'];
         $Reason = $row['Reason'];
         $timeOfSubmission = $row['timeOfSubmission'];
         $status = $row['status'];
-        echo "<tr><td>$id</td><td>$userId</td><td>$Days</td><td>$Reason</td><td>$timeOfSubmission</td><td>$status</td>
+        echo "<tr><td>$id</td><td>$userId</td><td>$Days</td><td>$startDate</td><td>$endDate</td><td>$Reason</td><td>$timeOfSubmission</td><td>$status</td>
               <td>
                   <form action='leaveList.php' method='POST'>
                     <input type='hidden' name='deleteLeaveID' value=".$id.">

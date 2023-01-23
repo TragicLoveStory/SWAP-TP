@@ -18,15 +18,28 @@
        echo "Must be logged in.";
         die();
     }  
-
+    $errorMessage = "";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Upload MC"){
         //client side size validation FOR User Experience
         if ($_FILES["uploadMC"]["size"] > 1000000) {
-            echo "File size is too large.";
+            echo "<p class='AlreadyLoggedInText'>File size is too large.</p>";
             die();
         }
         if(!empty($_POST['mcDays']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_FILES['uploadMC'])){
-            submitMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
+            $start = new DateTime(date('Y-m-d',strtotime($_POST['startDate'])));
+            $end = new DateTime(date('Y-m-d',strtotime($_POST['endDate'])));
+            $days  = $end->diff($start)->format('%a');
+            $days+=1;
+            if($_POST['mcDays'] == $days){
+                submitMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
+            }
+            else{
+                echo "<p class='AlreadyLoggedInText'>Number of days does not match start and end date.</p>";
+                die();
+            }
+        }
+        else{
+            $errorMessage = "No File Submitted.";
         }
     }
     try {
@@ -42,23 +55,20 @@
         }
     include 'navbar.php';
     ?>
-    <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">
-        <label for='mcDays'>Number of days for work leave:</label>
-        <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
-        <label for='startDate'>Start Date</label>
-        <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
-        <label for='endDate'>End Date</label>
-        <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
-        <label for='uploadMC'>Upload MC:</label>
-        <input type="file" name="uploadMC">
-        <input type="submit" value="Upload MC" name="Submit">
-    </form>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br><br><br><br><br><br>
+    <div class='container mcDivision'>
+        <form action="submitMC.php" method="post" enctype="multipart/form-data">
+            <label for='mcDays'>Number of days for work leave:</label>
+            <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
+            <label for='startDate'>Start Date</label>
+            <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+            <label for='endDate'>End Date</label>
+            <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+            <label for='uploadMC'>Upload MC:</label>
+            <input type="file" name="uploadMC"><br>
+            <input type="submit" value="Upload MC" name="Submit">
+        </form>
+        <p style='text-align: center; margin-bottom: 14.5rem;'><?= $errorMessage ?></p>
+    </div>
     <?php
     include 'footer.php';
     ?>

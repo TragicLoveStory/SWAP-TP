@@ -19,7 +19,7 @@
         if (isset($_POST['editUser']) && $_POST['editUser'] === 'Edit') {
             if(!empty($_POST['editUserID'])){
                 $_SESSION['editUserId'] = $_POST['editUserID'];
-                header("Location: http://localhost/SWAP-TP/editAccount.php?editing=true");
+                header("Location: https://localhost/SWAP-TP/editAccount.php?editing=true");
                 die();
             }
         }
@@ -46,7 +46,7 @@
         $result = $query-> get_result();
         echo "<div class='container listingTable'>
         <p>Users table containing employee accounts from all departments. Edit user details whenever necessary. Please contact <i>tpamcIT@tp.edu.sg</i> or any IT staff for any inquiries.<br>To create new users, click <a href='registerAccount.php'>here</a>:</p>
-        <table class='listingTable2'>
+        <table class='hidingTable2'>
             <tr><th>User ID</th><th>Email</th><th>Password</th><th>First name</th><th>Last name</th><th>Date Of Birth</th><th>Contact</th><th>Department</th><th>Occupation</th><th>Role</th><th>Status</th><th>About me</th><th>Profile Pic</th><th>OTP</th><th>Edit</th><th>Delete</th></tr>";
         while($row = $result -> fetch_assoc()){
             $id = $row['ID'];
@@ -78,7 +78,6 @@
             </td></tr>";
         }
         echo "</table></div>";
-        
         include "footer.php";
     }
     else{

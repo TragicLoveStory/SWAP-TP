@@ -15,15 +15,28 @@
     require "config.php";
     session_start();
     if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
-       echo "Must be logged in.";
+        echo "Must be logged in.";
         die();
 
     }
-
+    $errorMessage = "";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Submit Work Leave"){
         if(!empty($_POST['submitLeave']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_POST['reasonForLeave'])){
-            submitLeave($_POST['submitLeave'],$_POST['startDate'],$_POST['endDate'],$_POST['reasonForLeave']);
+            $start = new DateTime(date('Y-m-d',strtotime($_POST['startDate'])));
+            $end = new DateTime(date('Y-m-d',strtotime($_POST['endDate'])));
+            $days  = $end->diff($start)->format('%a');
+            $days+=1;
+            if($_POST['submitLeave'] == $days){
+                submitLeave($_POST['submitLeave'],$_POST['startDate'],$_POST['endDate'],$_POST['reasonForLeave']);
+            }
+            else{
+                echo "<p class='AlreadyLoggedInText'>Number of days does not match start and end date.</p>";
+                die();
+            }
         }  
+        else{
+            $errorMessage = "No fields must be empty";
+        }
     }
 
     try {
@@ -38,27 +51,21 @@
             die();
         }
     include 'navbar.php';
-
-
     ?>
-
-    <form action="submitLeave.php" method="post" style="text-align: center;">
-        <label for='submitLeave'>Number of days for work leave:</label>
-        <input type="number" id="submitLeave" name="submitLeave" min="1" max="60"><br>
-        <label for='startDate'>Start Date</label>
-        <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
-        <label for='endDate'>End Date</label>
-        <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
-        <label for='reasonForLeave'>Reason for work leave:</label>
-        <input type="text" id="reasonForLeave" name="reasonForLeave"><br>
-        <input type="submit" value="Submit Work Leave" name="Submit">
-    </form>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br><br><br><br><br><br>
+    <div class='container leaveDivision'>
+        <form action="submitLeave.php" method="post" >
+            <label for='submitLeave'>Number of days for work leave:</label>
+            <input type="number" id="submitLeave" name="submitLeave" min="1" max="60"><br>
+            <label for='startDate'>Start Date</label>
+            <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+            <label for='endDate'>End Date</label>
+            <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+            <label for='reasonForLeave'>Reason for work leave:</label>
+            <input type="text" id="reasonForLeave" name="reasonForLeave"><br>
+            <input type="submit" value="Submit Work Leave" name="Submit">
+        </form>
+        <p style='text-align: center; margin-bottom: 14.5rem;'><?= $errorMessage ?></p>
+    </div>
     <?php
     include 'footer.php';
     ?>

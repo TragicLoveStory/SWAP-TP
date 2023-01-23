@@ -148,6 +148,9 @@
     display: block;
     margin: 20px auto 20px auto;
 }
+.g-recaptcha{
+    margin-left: 1rem;
+}
 /* login Form css */
 
 .listingTable{
@@ -166,12 +169,121 @@
     border-bottom: 1px solid #a69cae;
     color: #3f3c43;
     max-width: 200px;
+    /* text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap; */
+    padding-left: 10px;
+}
+.listingTable2 th{
+    color: #3f3c43 !important;
+    text-align: left;
+    max-width: 250px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
     padding-left: 10px;
 }
-.listingTable2 th{
+
+
+.forumTable{
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.forumTable2{
+    border: 1px solid #a69cae;
+    width: 100%;
+    margin-bottom: 5rem;
+}
+.forumTable2 td{
+    border-bottom: 1px solid #a69cae;
+    color: #3f3c43;
+    max-width: 350px;
+    /* text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap; */
+    padding-left: 10px;
+}
+.forumTable2 th{
+    color: #3f3c43 !important;
+    text-align: left;
+    max-width: 250px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 10px;
+}
+.commentTable{
+    margin-bottom: 10rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.safetyThreadTable{
+    margin-top: 12%;
+    margin-bottom: 12%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.leaveDivision{
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    flex-direction: column;
+    margin-top: 14.5rem;
+    margin-bottom: 3rem;
+    justify-content: center;
+}
+.mcDivision{
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    flex-direction: column;
+    margin-top: 14.5rem;
+    margin-bottom: 3rem;
+    justify-content: center;
+    align-items: center;
+}
+.editThreadDivision{
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    flex-direction: column;
+    margin-top: 10rem;
+    margin-bottom: 7.5rem;
+    justify-content: center;
+}
+.editUserDivision{
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    flex-direction: column;
+    margin-top: 10rem;
+    margin-bottom: 7rem;
+    justify-content: center;
+}
+
+.hidingTable2{
+    border: 1px solid #a69cae;
+    width: 100%;
+    margin-bottom: 15rem;
+}
+.hidingTable2 td{
+    border-bottom: 1px solid #a69cae;
+    color: #3f3c43;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 10px;
+}
+.hidingTable2 th{
     color: #3f3c43 !important;
     text-align: left;
     max-width: 250px;

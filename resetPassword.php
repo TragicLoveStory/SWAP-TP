@@ -17,7 +17,7 @@
             die();
         }
         $uri = $_SERVER['REQUEST_URI'];
-        $fullUri = "http://localhost${uri}";
+        $fullUri = "https://localhost${uri}";
         $errorMessage="";
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Reset Password"){
             if(!empty($_POST['resetPassword']) && !empty($_POST['confirmPassword'])){

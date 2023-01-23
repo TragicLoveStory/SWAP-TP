@@ -10,6 +10,7 @@
 <body>
     <?php 
     require "leaveFunctions.php";
+    require "config.php";
     session_start();
     if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
        echo "Must be logged in.";
@@ -19,32 +20,48 @@
         echo "Error.";
         die();
     }
-
+    include "navbar.php";
+    $errorMessage = "";
     $uri = $_SERVER['REQUEST_URI'];
-    $fullUri = "http://localhost${uri}";
+    $fullUri = "https://localhost${uri}";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Edit MC"){
         //client side size validation FOR User Experience
         if ($_FILES["editMC"]["size"] > 1000000) {
-            echo "File size is too large.";
+            echo "<p class='AlreadyLoggedInText'>File size is too large.</p>";
             die();
         }
         if(!empty($_POST['mcDays']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_FILES['editMC'])){
             editMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
+            $start = new DateTime(date('Y-m-d',strtotime($_POST['startDate'])));
+            $end = new DateTime(date('Y-m-d',strtotime($_POST['endDate'])));
+            $days  = $end->diff($start)->format('%a');
+            $days+=1;
+            if($_POST['mcDays'] == $days){
+                submitMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
+            }
+            else{
+                echo "<p class='AlreadyLoggedInText'>Number of days does not match start and end date.</p>";
+                die();
+            }
         }
         
     }
     ?>
-    <form action="<?= $fullUri ?>" method="post" enctype="multipart/form-data" style="text-align: center;">
-        <label for='mcDays'>Number of days for work leave:</label>
-        <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
-        <label for='startDate'>Start Date</label>
-        <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
-        <label for='endDate'>End Date</label>
-        <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
-        <label for='editMC'>Edit MC:</label>
-        <input type="file" name="editMC">
-        <input type="submit" value="Edit MC" name="Submit">
-    </form>
+    <div class='container mcDivision'>
+        <form action="<?= $fullUri ?>" method="post" enctype="multipart/form-data">
+            <label for='mcDays'>Number of days for work leave:</label>
+            <input type="number" id="mcDays" name="mcDays" min="1" max="60"><br>
+            <label for='startDate'>Start Date</label>
+            <input type='date' name='startDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+            <label for='endDate'>End Date</label>
+            <input type='date' name='endDate'  min="1900-01-01" value="<?= date('Y-m-d'); ?>"><br>
+            <label for='editMC'>Edit MC:</label>
+            <input type="file" name="editMC"><br>
+            <input type="submit" value="Edit MC" name="Submit">
+        </form>
+        <p style='text-align: center; margin-bottom: 14.5rem;'><?= $errorMessage ?></p>
+    </div>
+    <?php include "footer.php"; ?>
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

@@ -30,7 +30,6 @@
                 printerror("Connecting to $db_hostname", $con);
                 die();
             }
-            else printok("Connecting to $db_hostname");
         if(isset($_SESSION['commentId'])){
             $query=$con->prepare("SELECT `userId`, `forumId`, `comment` FROM `comments` WHERE `ID` = ?");
             $query->bind_param('i',$_SESSION['commentId']); //bind the parameters

@@ -13,7 +13,7 @@
         require "config.php";
         require "userfunctions.php";
         $uri = $_SERVER['REQUEST_URI'];
-        $fullUri = "http://localhost${uri}";
+        $fullUri = "https://localhost${uri}";
         if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
             echo "Must be logged in.";
             die();
@@ -22,7 +22,7 @@
             echo "Error.";
             die();
         }
-
+        include "navbar.php";
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }
@@ -33,7 +33,8 @@
                 printerror("Connecting to $db_hostname", $con);
                 die();
             }
-            else printok("Connecting to $db_hostname");
+            //else printok("Connecting to $db_hostname");
+        $errorMessage="";
         if(isset($_GET['editingSafety']) && $_GET['editingSafety']==="true"){
             $query=$con->prepare("SELECT `safetyTitle`,`safetyContent`,`videoLink`FROM `workplacesafety` WHERE `id` =?");
             $query->bind_param('i', $_SESSION['safetyID']); //bind the parameters
@@ -47,34 +48,23 @@
                 editSafetyThread($_POST['title'],$_POST['content'],$_POST['video']);
             }
             else{
-                echo "Error: No fields should be empty<br>";
+                $errorMessage = "Error: No fields must be empty";
             }
         }
     ?>
-    <form action="<?= $fullUri ?>" method='post'>
-    <table style='text-align: left; margin-left: auto; margin-right: auto;'>
-    <tr>
-        <th></th>
-        <th style='text-align: center;'>Edit Safety Thread</th>
-    </tr>
-    <tr>
-        <td><label for='title'>Title:</label></td>
-        <td><input type='text' name='title' style="width: 375px;" value="<?= $row['safetyTitle']; ?>"><br></td>
-    </tr>
-    <tr>
-        <td><label for='content'>Content:</label></td>
-        <td><textarea name="content" rows="8" cols="50" style="resize:none; white-space: pre-wrap;"><?= $row['safetyContent']; ?></textarea><br></td>
-    </tr>
-    <tr>
-        <td><label for='video'>Video Link:</label></td>
-        <td><input type='text' name='video' style="width: 375px;" value="<?= $row['videoLink']; ?>"><br></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td style='text-align: right;'><input type='submit' value='Edit Safety Thread' name='Submit'></td>
-    </tr>  
-    </table>
-    </form>
+    <div class='container editThreadDivision'>
+        <p style='text-align: center;'><?= $errorMessage ?></p>
+        <form action="<?= $fullUri ?>" method='post'>
+            <label for='title'>Title:</label><br>
+            <input type='text' name='title' style="width: 375px;" value="<?= $row['safetyTitle']; ?>"><br>
+            <label for='content'>Content:</label><br>
+            <textarea name="content" rows="8" cols="50" style="resize:none; white-space: pre-wrap;"><?= $row['safetyContent']; ?></textarea><br>
+            <label for='video'>Video Link:</label><br>
+            <input type='text' name='video' style="width: 375px;" value="<?= $row['videoLink']; ?>"><br>
+            <input type='submit' value='Edit Safety Thread' name='Submit' style='margin-top: 1rem;'>
+        </form>
+    </div>
+    <?php include "footer.php" ?>
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

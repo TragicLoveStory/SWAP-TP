@@ -12,7 +12,7 @@ function deleteThread($forumID) {
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
     $query=$con->prepare("DELETE FROM `forum` WHERE `id`=?");
     $query->bind_param('i', $forumID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
@@ -20,7 +20,7 @@ function deleteThread($forumID) {
         die();
     }
     else{
-        echo "Error Executing Query";
+        printerror("Selecting $db_database",$con);
     }
 }
 //Archive/Locking of forum thread (administrator)
@@ -36,7 +36,7 @@ function archiveThread($archiveStatus,$forumID) {
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
     if($archiveStatus == 1){
         $threadStatus = 0;
     }
@@ -53,7 +53,7 @@ function archiveThread($archiveStatus,$forumID) {
         die();
     }
     else{
-        echo "Error Executing Query";
+        printerror("Selecting $db_database",$con);
     }
 }
 // Creating Forum Thread
@@ -70,7 +70,7 @@ function createThread($title,$content){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
     //input validation
     $sanitizedTitle = htmlspecialchars($title);
     $sanitizedContent = htmlspecialchars($content);
@@ -97,7 +97,7 @@ function viewCounter($viewCount,$forumID){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
 
     $viewCount+=1;
     $query=$con->prepare("UPDATE `forum` SET `viewCount`=? WHERE `id`=?");
@@ -122,7 +122,7 @@ function editThread($title,$content,$forumID){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
     //input validation
     $sanitizedTitle = htmlspecialchars($title);
     $sanitizedContent = htmlspecialchars($content);
@@ -154,7 +154,7 @@ function createComment($comment){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
     //input validation
     $sanitizedComment = htmlspecialchars($comment);
     $forumId = $_SESSION['forumId'];
@@ -182,7 +182,7 @@ function editComment($comment,$commentID,$forumId){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
     //input validation
     $sanitizedComment = htmlspecialchars($comment);
     $query=$con->prepare("UPDATE `comments` SET `comment`=? WHERE `ID`=?");
@@ -209,7 +209,7 @@ function deleteComment($commentID,$forumID){
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
     $query=$con->prepare("DELETE FROM `comments` WHERE `ID`=?");
     $query->bind_param('i', $commentID); //bind the parameters
     if($query->execute()){ //executing query (processes and print the results)
@@ -233,7 +233,7 @@ function likeComment($commentID,$forumID){
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
 
     // check if user already liked/disliked
     $query=$con->prepare("SELECT `id`,`commentId`,`userId`,`status` FROM `commentlikes` WHERE `commentId` = ? AND `userId` = ?");
@@ -290,7 +290,7 @@ function dislikeComment($commentID,$forumID){
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
 
     // check if user already liked/disliked
     $query=$con->prepare("SELECT `id`,`commentId`,`userId`,`status` FROM `commentlikes` WHERE `commentId` = ? AND `userId` = ?");

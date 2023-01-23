@@ -37,25 +37,24 @@
             }
         //else printok("Connecting to $db_hostname");
         include 'navbar.php';
-        $query=$con->prepare("select `id`,`userId`,`mcFile`,`Days`,`timeOfSubmission`,`status`from medicalcertificate");
+        $query=$con->prepare("select `id`,`userId`,`mcFile`,`Days`,`startDate`,`endDate`,`timeOfSubmission`,`status`from medicalcertificate");
         $query->execute();
-        $query->bind_result($id, $userId, $mcFile, $Days, $timeOfSubmission,$status);
-        //echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
-        //echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
         $result = $query->get_result();
         echo "<div class ='container listingTable'>
-        <p>Table that contains the application for Medical Certificate by employees and to list whether Medical Certificate is approved.</p>
+        <p style='margin-bottom: 5rem;'>Table that contains the application for Medical Certificate by employees and to list whether Medical Certificate is approved.</p>
         <table class='listingTable2'>
-            <tr><th>MC ID</th><th>User ID</th><th>MC(Image)</th><th>MC(File)</th><th>Days</th><th>Time of Submission</th><th>status</th><th>Delete</th></tr>";
+            <tr><th>MC ID</th><th>User ID</th><th>MC(Image)</th><th>MC(File)</th><th>Days</th><th>Start Date</th><th>End Date</th><th>Time of Submission</th><th>status</th><th>Delete</th></tr>";
         while($row = $result->fetch_assoc()){
         $id = $row['id'];
         $userId = $row['userId'];
         $mcFile = $row['mcFile'];
         $fileName = basename("/".$mcFile);
         $Days = $row['Days'];
+        $startDate = $row['startDate'];
+        $endDate = $row['endDate'];
         $timeOfSubmission = $row['timeOfSubmission'];
         $status = $row['status'];
-        echo "<tr><td>$id</td><td>$userId</td><td><img src='$mcFile' class='image'></td><td>$fileName</td><td>$Days</td><td>$timeOfSubmission</td><td>$status</td>
+        echo "<tr><td>$id</td><td>$userId</td><td><img src='$mcFile' class='image'></td><td>$fileName</td><td>$Days</td><td>$startDate</td><td>$endDate</td><td>$timeOfSubmission</td><td>$status</td>
               <td>
                 <form action='mcList.php' method='POST'>
                     <input type='hidden' name='deleteMcID' value=".$id.">
@@ -63,7 +62,7 @@
                 </form>
               </td></tr>";
         }
-        echo "</table>";
+        echo "</table></div>";
         echo "<br>";
         include 'footer.php';
     }
@@ -81,7 +80,7 @@
             white-space: nowrap;
         }
         .image{
-            height: 70%;
+            height: 50%;
             width: 70%;
 
         }

@@ -16,6 +16,7 @@
             echo "Only permitted for Users.";
             die();
         } 
+        include "navbar.php";
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
             }
@@ -26,6 +27,7 @@
                 printerror("Connecting to $db_hostname", $con);
                 die();
             }
+        $errorMessage="";
             //else printok("Connecting to $db_hostname");
         require_once "userFunctions.php";
         require_once "config.php";
@@ -44,7 +46,7 @@
                 editProfile($_POST['firstName'],$_POST['lastName'],$_POST['contactNumber'],$_POST['aboutMe']);
             }
             else{
-                echo "No field must be null.";
+                $errorMessage="Error: no field must be null.";
             }
         }
     ?>
@@ -62,7 +64,9 @@
             <textarea name="aboutMe" rows="8" cols="50" style="resize:none; white-space: pre-wrap;"><?= $row['aboutMe'] ?></textarea><br>
             <input type="submit" name="confirmChanges" value="Submit Changes"><br>
         </form>
+        <p style='text-align: center; margin-top: 1rem;'><?= $errorMessage ?></p>
     </div>
+    <?php include "footer.php"; ?>
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

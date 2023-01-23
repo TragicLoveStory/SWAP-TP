@@ -7,6 +7,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class='backgroundImage'>
     <?php 
@@ -15,8 +16,8 @@
     require "Authentication.php";
     $errorMessage = "";
     if(isset($_POST['Submit']) && $_POST['Submit'] === "Sign in"){
-        if(!empty($_POST['username']) && !empty($_POST['password'])){
-            if(login($_POST['username'],$_POST['password'])){
+        if(!empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['g-recaptcha-response'])){
+            if(login($_POST['username'],$_POST['password'],$_POST['g-recaptcha-response'])){
             }
             else{
                 $errorMessage = "Email and/or Password is incorrect!";
@@ -36,6 +37,7 @@
             <form method="post" action="loginForm.php">
                 <input type="text" name="username" placeholder="Username" class="inputField">
                 <input type="password" name="password" placeholder="Password" class="inputField">
+                <div class="g-recaptcha" data-sitekey="6Lc9GR0kAAAAABFRWW083X5exGwGO2CgFxbR8G6b" style='width: 300px;'></div>
                 <input type="submit" value="Sign in" name="Submit" class="signInButton">
             </form>
             <hr>

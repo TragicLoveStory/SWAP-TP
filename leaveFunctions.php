@@ -12,7 +12,6 @@ function submitMC($days,$startDate,$endDate){
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
     //check date inputs
     $checkall = true;
     $checkall=$checkall && dateCheck($startDate);
@@ -63,9 +62,8 @@ function submitMC($days,$startDate,$endDate){
             $query=$con->prepare("INSERT INTO `medicalcertificate` (`userId`,`mcFile`, `Days`,`startDate`,`endDate`,`department`) VALUES (?,?,?,?,?,?)");
             $query->bind_param('isisss', $_SESSION['ID'],$target_file,$days,$startDate,$endDate,$_SESSION['department']);
             if($query->execute()){ //executing query (processes and print the results)
-                // header("Location: http://localhost/SWAP-TP/SubmitMC.php");
-                // die();
-                printok("Successfully Uploaded."); 
+                header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
+                die();
             }
             else{
                 printerror("Selecting $db_database",$con);
@@ -128,7 +126,7 @@ function submitLeave($days,$startDate,$endDate,$reason){
         printerror("Connecting to $db_hostname", $con);
         die();
     }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
     // validate number of days requested
     if($days > 60 || $days < 1){
         echo "Incorrect number of days requested.";
@@ -146,9 +144,8 @@ function submitLeave($days,$startDate,$endDate,$reason){
     $query=$con->prepare("INSERT INTO `workleave` (`userId`,`Days`,`startDate`,`endDate`,`Reason`,`department`) VALUES (?,?,?,?,?,?)");
     $query->bind_param('iissss', $_SESSION['ID'],$days,$startDate,$endDate,$reason,$_SESSION['department']);
     if($query->execute()){ //executing query (processes and print the results)
-        // header("Location: http://localhost/SWAP-TP/SubmitMC.php");
-        // die();
-        printok("Successfully Uploaded."); 
+        header("Location: https://localhost/SWAP-TP/attendanceAndLeave.php");
+        die();
     }
     else{
         printerror("Selecting $db_database",$con);

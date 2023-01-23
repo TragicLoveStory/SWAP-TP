@@ -79,21 +79,17 @@
         } 
     }
     $percentage = round(($counter / $days) * 100,2);
-    echo "<table>";
-    echo "<div id='toggle1'><p style='text-align: center;'>Your Current Attendance:</p><table align='center' border='1'><tr>";
-    echo "<th>";
+    echo "<p style='text-align: center; margin-top: 3%;'>Your Current Attendance:</p>";
     echo "<p style='text-align: center;'>Attendance: ".$counter."/".$days." (".$percentage."%)"."</p>";
-    echo "</th>";
-    echo "</table>";
 
     $query2=$con->prepare("SELECT `id`,`userId`,`Days`,`startDate`,`endDate`,`Reason`,`department`,`timeOfSubmission`,`status` FROM workleave WHERE userId = ?");
     $query2->bind_param('i', $_SESSION['ID']); //bind the parameters
     $query2->execute();
     $result2 = $query2-> get_result();
-    echo "<br>";
-    echo "<div id='toggle0'><p style='text-align: center;'>Leave Requests:</p><table align='center' border='1'><tr>";
-    echo
-    "<th>Id</th><th>User Id</th><th>Number of Days</th><th>Start Date</th><th>End Date</th><th>Reason</th><th>Department</th><th>Time of Submission</th><th>status</th></tr>";
+    echo "<div class='container forumTable' style='margin-top: 3%;'>
+        <p style='text-align: center;'>Leave Requests:</p>
+        <table class='forumTable2'>
+            <tr><th>Leave ID</th><th>User Id</th><th>Number of Days</th><th>Start Date</th><th>End Date</th><th>Reason</th><th>Department</th><th>Time of Submission</th><th>status</th></tr>";
     while($row2 = $result2 -> fetch_assoc()){
         $id = $row2['id'];
         $userId = $row2['userId'];
@@ -105,22 +101,22 @@
         $timeOfSubmission = $row2['timeOfSubmission'];
         $status = $row2['status'];
         if($status === -1){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th>
-            <th>
+            echo "<td>$id</td><td>$userId</td><td>$Days</td><td>$startDate</td><td>$endDate</td><td>$Reason</td><td>$department</td><td>$timeOfSubmission</td><td>$status</td>
+            <td>
                 <form action='attendanceAndLeave.php' method='POST'>
                     <input type='hidden' name='editLeaveID' value=".$id.">
                     <input type='submit' name='editLeave' value='Edit'>
                 </form>
-            </th>
-            <th>
+            </td>
+            <td>
                 <form action='attendanceAndLeave.php' method='POST'>
                     <input type='hidden' name='deleteLeaveID' value=".$id.">
                     <input type='submit' name='deleteLeave' value='Delete'>
                 </form>
-            </th></tr>";
+            </td></tr>";
         }
         elseif($status === 1 || $status === 0){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$startDate</th><th>$endDate</th><th>$Reason</th><th>$department</th><th>$timeOfSubmission</th><th>$status</th></tr>";
+            echo "<td>$id</td><td>$userId</td><td>$Days</td><td>$startDate</td><td>$endDate</td><td>$Reason</td><td>$department</td><td>$timeOfSubmission</td><td>$status</td></tr>";
         }
         
 
@@ -131,10 +127,10 @@
     $query3->bind_param('i',$_SESSION['ID']);
     $query3->execute();
     $result3 = $query3-> get_result();
-    echo "<br>";
-    echo "<div id='toggle2'><p style='text-align: center;'>MC Requests:</p><table align='center' border='1'><tr>";
-    echo
-    "<th>Id</th><th>User Id</th><th>MC(File)</th><th>Days</th><th>Start Date</th><th>End Date</th><th>Department</th><th>Time of Submission</th><th>status</th></tr>";
+    echo "<div class='container forumTable' style='margin-top: 3%;'>
+        <p style='text-align: center;'>Medical Certificate(MC) Requests:</p>
+        <table class='forumTable2' style='margin-bottom: 10rem;'>
+            <tr><th>MC ID</th><th>User Id</th><th>MC(File)</th><th>Number of days</th><th>Start Date</th><th>End Date</th><th>Department</th><th>Time of Submission</th><th>status</th></tr>";
     while ($row3 = $result3->fetch_assoc()) {
         $id2 = $row3['id'];
         $userId2 = $row3['userId'];
@@ -146,29 +142,26 @@
         $timeOfSubmission2 = $row3['timeOfSubmission'];
         $status2 = $row3['status'];
         if($status2 === -1){
-            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th>
-            <th>
+            echo "<td>$id2</td><td>$userId2</td><td>$mcFile2</td><td>$Days2</td><td>$startDate2</td><td>$endDate2</td><td>$department2</td><td>$timeOfSubmission2</td><td>$status2</td>
+            <td>
                 <form action='attendanceAndLeave.php' method='POST'>
                     <input type='hidden' name='editMcID' value=".$id2.">
                     <input type='submit' name='editMC' value='Edit'>
                 </form>
-            </th>
-            <th>
+            </td>
+            <td>
                 <form action='attendanceAndLeave.php' method='POST'>
                     <input type='hidden' name='deleteMCID' value=".$id2.">
                     <input type='submit' name='deleteMC' value='Delete'>
                 </form>
-            </th></tr>";
+            </td></tr>";
         }
         elseif($status2 === 0 || $status2 === 1){
-            echo "<th>$id2</th><th>$userId2</th><th>$mcFile2</th><th>$Days2</th><th>$startDate2</th><th>$endDate2</th><th>$department2</th><th>$timeOfSubmission2</th><th>$status2</th></tr>";
+            echo "<td>$id2</td><td>$userId2</td><td>$mcFile2</td><td>$Days2</td><td>$startDate2</td><td>$endDate2</td><td>$department2</td><td>$timeOfSubmission2</td><td>$status2</td></tr>";
         }
         
     }
     echo "</table></div>";
-    echo "<br>";
-    echo "<br>";
-    echo "<br>";
     include 'footer.php';
     ?>
     <!-- <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">

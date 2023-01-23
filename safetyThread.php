@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
     <?php 
@@ -29,9 +31,9 @@
             die();
         }
         else {
-            printok("Connecting to $db_hostname");
         }
         // loading of thread details
+        include "navbar.php";
         $query=$con->prepare("SELECT `safetyTitle`,`safetyContent`,`videoLink`,`createOn`,`lastEdited` from `workplacesafety` WHERE id=?"); 
         $query->bind_param('i',$_GET['safetyID']);
         if($query->execute()){ //executing query (processes and print the results)
@@ -39,25 +41,22 @@
             $row = $result->fetch_assoc(); 
         }
     ?>
-    <table align='center' border='1'>
+    <div class='container safetyThreadTable'>
+        <table class='forumTable2'>
             <tr>
-                <th>safetyTitle</th><th>safetyContent</th><th>videoLink</th><th>createOn</th><th>lastEdited</th>
+                <th>Title</th><th>Content</th><th>Video link</th><th>Created on</th><th>Last edited</th>
             </tr>
             <tr>
-                <th><?= $row['safetyTitle'] ?></th><th><?= $row['safetyContent'] ?></th><th><?= $row['videoLink'] ?></th><th><?= $row['createOn'] ?></th><th><?= $row['lastEdited'] ?></th>
+                <td><?= $row['safetyTitle'] ?></td><td><?= $row['safetyContent'] ?></td><td><?= $row['videoLink'] ?></td><td><?= $row['createOn'] ?></td><td><?= $row['lastEdited'] ?></td>
             </tr>
         </table>
-    <style>
-        .Content{
-            max-width: 300px;
-        }
-    </style>
+    </div> 
+    <?php include "footer.php" ?>
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
+<!-- Include every Bootstrap JavaScript plugin and dependency  -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://www.w3schools.com/lib/w3.js"></script> <!-- Include EVERY OTHER HTML Files to this file-->
 <script>
     //to bring in other HTML on the fly into this page
