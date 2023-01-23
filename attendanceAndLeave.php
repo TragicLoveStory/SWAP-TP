@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
     <?php 
@@ -50,12 +52,14 @@
         }
         catch (Exception $e) {
             printerror($e->getMessage(),$con);
+        
         }
         if (!$con) {
             printerror("Connecting to $db_hostname", $con);
             die();
         }
-    else printok("Connecting to $db_hostname");
+    //else printok("Connecting to $db_hostname");
+    include 'navbar.php';
     date_default_timezone_set('Asia/Singapore');
     $counter = 0;
     $startDate = strtotime("2022/12/22");
@@ -75,15 +79,21 @@
         } 
     }
     $percentage = round(($counter / $days) * 100,2);
+    echo "<table>";
+    echo "<div id='toggle1'><p style='text-align: center;'>Your Current Attendance:</p><table align='center' border='1'><tr>";
+    echo "<th>";
     echo "<p style='text-align: center;'>Attendance: ".$counter."/".$days." (".$percentage."%)"."</p>";
+    echo "</th>";
+    echo "</table>";
 
     $query2=$con->prepare("SELECT `id`,`userId`,`Days`,`startDate`,`endDate`,`Reason`,`department`,`timeOfSubmission`,`status` FROM workleave WHERE userId = ?");
     $query2->bind_param('i', $_SESSION['ID']); //bind the parameters
     $query2->execute();
     $result2 = $query2-> get_result();
-    echo "<div id='toggle1'><p style='text-align: center;'>Leave Requests:</p><table align='center' border='1'><tr>";
+    echo "<br>";
+    echo "<div id='toggle0'><p style='text-align: center;'>Leave Requests:</p><table align='center' border='1'><tr>";
     echo
-    "<th>id</th><th>userId</th><th>Days</th><th>startDate</th><th>endDate</th><th>Reason</th><th>Department</th><th>timeOfSubmission</th><th>status</th></tr>";
+    "<th>Id</th><th>User Id</th><th>Number of Days</th><th>Start Date</th><th>End Date</th><th>Reason</th><th>Department</th><th>Time of Submission</th><th>status</th></tr>";
     while($row2 = $result2 -> fetch_assoc()){
         $id = $row2['id'];
         $userId = $row2['userId'];
@@ -121,9 +131,10 @@
     $query3->bind_param('i',$_SESSION['ID']);
     $query3->execute();
     $result3 = $query3-> get_result();
+    echo "<br>";
     echo "<div id='toggle2'><p style='text-align: center;'>MC Requests:</p><table align='center' border='1'><tr>";
     echo
-    "<th>id</th><th>userId</th><th>mcFile</th><th>Days</th><th>startDate</th><th>endDate</th><th>Department</th><th>timeOfSubmission</th><th>status</th></tr>";
+    "<th>Id</th><th>User Id</th><th>MC(File)</th><th>Days</th><th>Start Date</th><th>End Date</th><th>Department</th><th>Time of Submission</th><th>status</th></tr>";
     while ($row3 = $result3->fetch_assoc()) {
         $id2 = $row3['id'];
         $userId2 = $row3['userId'];
@@ -155,6 +166,10 @@
         
     }
     echo "</table></div>";
+    echo "<br>";
+    echo "<br>";
+    echo "<br>";
+    include 'footer.php';
     ?>
     <!-- <form action="submitMC.php" method="post" enctype="multipart/form-data" style="text-align: center;">
         <label for='mcDays'>Number of days for work leave:</label>

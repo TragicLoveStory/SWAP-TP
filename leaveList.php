@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
     <?php 
@@ -13,50 +15,60 @@
     require "userFunctions.php";
     require "leaveFunctions.php";
     session_start();
-    if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="LEAVE-ADMIN"){
+    if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "LEAVE-ADMIN") {
 
-        if (isset($_POST['deleteLeave']) && $_POST['deleteLeave'] === 'Delete') {
-            if(!empty($_POST['deleteLeaveID'])){
-                deleteLeave($_POST['deleteLeaveID']);
-            }
+      if (isset($_POST['deleteLeave']) && $_POST['deleteLeave'] === 'Delete') {
+        if (!empty($_POST['deleteLeaveID'])) {
+          deleteLeave($_POST['deleteLeaveID']);
         }
+      }
 
-        echo "Permitted for Leave Admins";
-        //connection to internalhr database
-        try {
-            $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
-            }
-            catch (Exception $e) {
-                printerror($e->getMessage(),$con);
-            }
-            if (!$con) {
-                printerror("Connecting to $db_hostname", $con);
-                die();
-            }
-        else printok("Connecting to $db_hostname");
-        // loading of user details
-        $query=$con->prepare("select `id`,`userId`,`Days`,`Reason`,`timeOfSubmission`,`status`from workleave");
-        $query->execute();
-        $query->bind_result($id, $userId, $Days, $Reason, $timeOfSubmission,$status);
-        echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
-        echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
-        echo "<table align='center' border='1'><tr>";
-        echo
-        "<th>id</th><th>userId</th><th>Days</th><th>Reason</th><th>timeOfSubmission</th><th>status</th></tr>";
-        while($query->fetch()){
-            echo "<th>$id</th><th>$userId</th><th>$Days</th><th>$Reason</th><th>$timeOfSubmission</th><th>$status</th>
-            <th>
-                <form action='leaveList.php' method='POST'>
-                    <input type='hidden' name='deleteLeaveID' value=".$id.">
-                    <input type='submit' name='deleteLeave' value='Delete'>
-                </form>
-            </th></tr>";
-        }
-        echo "</table>";
-    }
-    else{
-        echo "Only permitted for Attendance & Leave Admins";
+      //echo "Permitted for Leave Admins";
+      //connection to internalhr database
+      try {
+        $con = mysqli_connect($db_hostname, $db_username, $db_password, $db_database);
+      } catch (Exception $e) {
+        //printerror($e->getMessage(),$con);
+      }
+      if (!$con) {
+        //printerror("Connecting to $db_hostname", $con);
         die();
+      }
+      //else printok("Connecting to $db_hostname");
+      include 'navbar.php';
+      // loading of user details
+      $query = $con->prepare("select `id`,`userId`,`Days`,`Reason`,`timeOfSubmission`,`status`from workleave");
+      $query->execute();
+      $query->bind_result($id, $userId, $Days, $Reason, $timeOfSubmission, $status);
+      $result = $query->get_result();
+      //echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
+      //echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
+      echo "<div class ='container listingTable'>
+        <p>Table that contains the application for leaves by employees and to list whether leave is approved.</p>
+        <table class='listingTable2'>
+            <tr><th> Leave ID</th><th>User ID</th><th>Number of Days</th><th>Reason for Leave</th><th>Time of Submission</th><th>Status</th><th>Delete</th></tr>";
+      while ($row = $result->fetch_assoc()) {
+        $id = $row['id'];
+        $userId = $row['userId'];
+        $Days = $row['Days'];
+        $Reason = $row['Reason'];
+        $timeOfSubmission = $row['timeOfSubmission'];
+        $status = $row['status'];
+        echo "<tr><td>$id</td><td>$userId</td><td>$Days</td><td>$Reason</td><td>$timeOfSubmission</td><td>$status</td>
+              <td>
+                  <form action='leaveList.php' method='POST'>
+                    <input type='hidden' name='deleteLeaveID' value=".$id.">
+                    <input type='submit' name='delete' value='Delete'>
+                  </form>
+              </td></tr>";
+      }
+      echo "</table></div>";
+
+      include 'footer.php';
+    }
+    else {
+      echo "Only permitted for Leave Admins.";
+      die();
     }
     ?>
 </body>

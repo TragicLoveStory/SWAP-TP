@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
     <?php 
@@ -15,13 +17,13 @@
     session_start();
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="LEAVE-ADMIN"){
 
-        if (isset($_POST['deleteMc']) && $_POST['deleteMc'] === 'Delete') {
+        if (isset($_POST['deleteMC']) && $_POST['deleteMC'] === 'Delete') {
             if(!empty($_POST['deleteMcID'])){
                 deleteMC($_POST['deleteMcID']);
             }
         }
 
-        echo "Permitted for Leave Admins";
+        //echo "Permitted for Leave Admins";
         //connection to internalhr database
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -33,27 +35,37 @@
                 printerror("Connecting to $db_hostname", $con);
                 die();
             }
-        else printok("Connecting to $db_hostname");
-        // loading of user details
+        //else printok("Connecting to $db_hostname");
+        include 'navbar.php';
         $query=$con->prepare("select `id`,`userId`,`mcFile`,`Days`,`timeOfSubmission`,`status`from medicalcertificate");
         $query->execute();
         $query->bind_result($id, $userId, $mcFile, $Days, $timeOfSubmission,$status);
-        echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
-        echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
-        echo "<table align='center' border='1'><tr>";
-        echo
-        "<th>id</th><th>userId</th><th>mcFile</th><th>mcFile</th><th>Days</th><th>timeOfSubmission</th><th>status</th></tr>";
-        while($query->fetch()){
-            $fileName = basename("/".$mcFile);
-            echo "<th>$id</th><th>$userId</th><th><img src='$mcFile' class='image'></th><th>$fileName</th><th>$Days</th><th>$timeOfSubmission</th><th>$status</th>
-            <th>
+        //echo "<p>TESTING PLACING FETCH HTML AT SPECIFIC LOCATION.</p>";
+        //echo "<p>IF TABLE IS BELOW THIS TEXT, THE TEST IS SUCCESSFUL.</p>";
+        $result = $query->get_result();
+        echo "<div class ='container listingTable'>
+        <p>Table that contains the application for Medical Certificate by employees and to list whether Medical Certificate is approved.</p>
+        <table class='listingTable2'>
+            <tr><th>MC ID</th><th>User ID</th><th>MC(Image)</th><th>MC(File)</th><th>Days</th><th>Time of Submission</th><th>status</th><th>Delete</th></tr>";
+        while($row = $result->fetch_assoc()){
+        $id = $row['id'];
+        $userId = $row['userId'];
+        $mcFile = $row['mcFile'];
+        $fileName = basename("/".$mcFile);
+        $Days = $row['Days'];
+        $timeOfSubmission = $row['timeOfSubmission'];
+        $status = $row['status'];
+        echo "<tr><td>$id</td><td>$userId</td><td><img src='$mcFile' class='image'></td><td>$fileName</td><td>$Days</td><td>$timeOfSubmission</td><td>$status</td>
+              <td>
                 <form action='mcList.php' method='POST'>
                     <input type='hidden' name='deleteMcID' value=".$id.">
-                    <input type='submit' name='deleteMc' value='Delete'>
+                    <input type='submit' name='deleteMC' value='Delete'>
                 </form>
-            </th></tr>";
+              </td></tr>";
         }
         echo "</table>";
+        echo "<br>";
+        include 'footer.php';
     }
     else{
         echo "Only permitted for Attendance & Leave Admins";
