@@ -17,27 +17,46 @@
     require "userFunctions.php";
     require "leaveFunctions.php";
     session_start();
+    if(isset($_SESSION['token']) && isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['pageName'])){
+            if($_SESSION['pageName'] == "authoriseLeave.php"){
+                $csrfToken = $_SESSION['token'];
+            }
+            else{
+                $csrfToken = hash("sha256",uniqid(rand(), TRUE));
+                $_SESSION['token'] = $csrfToken;
+                $_SESSION['tokenTime'] = time();
+                $_SESSION['pageName'] = "authoriseLeave.php";
+            }
+        }
+    }
+    else{
+        $csrfToken = hash("sha256",uniqid(rand(), TRUE));
+        $_SESSION['token'] = $csrfToken;
+        $_SESSION['tokenTime'] = time();
+        $_SESSION['pageName'] = "authoriseLeave.php";
+    }
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && isset($_SESSION["occupation"])){
         if($_SESSION["role"]==="LEAVE-ADMIN"){
             include "navbar.php";
             if (isset($_POST['denyLeave']) && $_POST['denyLeave'] === 'Deny') {
-                if(!empty($_POST['denyLeaveID'])){
-                    denyLeaveRequest($_POST['denyLeaveID']);
+                if(!empty($_POST['denyLeaveID']) && !empty($_POST['denyLeaveToken'])){
+                    denyLeaveRequest($_POST['denyLeaveID'],$_POST['denyLeaveToken']);
                 }
             }
             if (isset($_POST['denyMc']) && $_POST['denyMc'] === 'Deny') {
-                if(!empty($_POST['denyMcID'])){
-                    denyMcRequest($_POST['denyMcID']);
+                if(!empty($_POST['denyMcID']) && !empty($_POST['denyMcToken'])){
+                    denyMcRequest($_POST['denyMcID'],$_POST['denyMcToken']);
                 }
             }
             if (isset($_POST['approveLeave']) && $_POST['approveLeave'] === 'Approve') {
-                if(!empty($_POST['approveLeaveID']) && !empty($_POST['approveLeaveUserId']) && !empty($_POST['approveLeaveStartDate']) && !empty($_POST['approveLeaveEndDate']) && !empty($_POST['approveLeaveDays'])){
-                    approveLeaveRequest($_POST['approveLeaveID'],$_POST['approveLeaveUserId'],$_POST['approveLeaveStartDate'],$_POST['approveLeaveEndDate'],$_POST['approveLeaveDays']);
+                if(!empty($_POST['approveLeaveID']) && !empty($_POST['approveLeaveUserId']) && !empty($_POST['approveLeaveStartDate']) && !empty($_POST['approveLeaveEndDate']) && !empty($_POST['approveLeaveDays']) && !empty($_POST['approveLeaveToken'])){
+                    approveLeaveRequest($_POST['approveLeaveID'],$_POST['approveLeaveUserId'],$_POST['approveLeaveStartDate'],$_POST['approveLeaveEndDate'],$_POST['approveLeaveDays'],$_POST['approveLeaveToken']);
                 }
             }
             if (isset($_POST['approveMc']) && $_POST['approveMc'] === 'Approve') {
-                if(!empty($_POST['approveMcID']) && !empty($_POST['approveMcUserId']) && !empty($_POST['approveMcStartDate']) && !empty($_POST['approveMcEndDate']) && !empty($_POST['approveMcDays'])){
-                    approveMcRequest($_POST['approveMcID'],$_POST['approveMcUserId'],$_POST['approveMcStartDate'],$_POST['approveMcEndDate'],$_POST['approveMcDays']);
+                if(!empty($_POST['approveMcID']) && !empty($_POST['approveMcUserId']) && !empty($_POST['approveMcStartDate']) && !empty($_POST['approveMcEndDate']) && !empty($_POST['approveMcDays']) && !empty($_POST['approveMcToken'])){
+                    approveMcRequest($_POST['approveMcID'],$_POST['approveMcUserId'],$_POST['approveMcStartDate'],$_POST['approveMcEndDate'],$_POST['approveMcDays'],$_POST['approveMcToken']);
                 }
             }
 
@@ -80,12 +99,14 @@
                         <input type='hidden' name='approveLeaveStartDate' value=".strtotime($startDate).">
                         <input type='hidden' name='approveLeaveEndDate' value=".strtotime($endDate).">
                         <input type='hidden' name='approveLeaveDays' value=".$Days.">
+                        <input type='hidden' name='approveLeaveToken' value=".$csrfToken.">
                         <input type='submit' name='approveLeave' value='Approve'>
                     </form>
                 </td>
                 <td>
                     <form action='authoriseLeave.php' method='POST'>
                         <input type='hidden' name='denyLeaveID' value=".$id.">
+                        <input type='hidden' name='denyLeaveToken' value=".$csrfToken.">
                         <input type='submit' name='denyLeave' value='Deny'>
                     </form>
                 </td></tr>";
@@ -117,12 +138,14 @@
                         <input type='hidden' name='approveMcStartDate' value=".strtotime($startDate2).">
                         <input type='hidden' name='approveMcEndDate' value=".strtotime($endDate2).">
                         <input type='hidden' name='approveMcDays' value=".$Days2.">
+                        <input type='hidden' name='approveMcToken' value=".$csrfToken.">
                         <input type='submit' name='approveMc' value='Approve'>
                     </form>
                 </td>
                 <td>
                     <form action='authoriseLeave.php' method='POST'>
                         <input type='hidden' name='denyMcID' value=".$id2.">
+                        <input type='hidden' name='denyMcToken' value=".$csrfToken.">
                         <input type='submit' name='denyMc' value='Deny'>
                     </form>
                 </td></tr>";
@@ -132,19 +155,26 @@
         }
         elseif($_SESSION['occupation'] === "MANAGER"){
             include "navbar.php";
-            if (isset($_GET['leaveDeny']) && $_GET['leaveDeny'] === 'true') {
-                denyLeaveRequest();
+            if (isset($_POST['denyLeave']) && $_POST['denyLeave'] === 'Deny') {
+                if(!empty($_POST['denyLeaveID']) && !empty($_POST['denyLeaveToken'])){
+                    denyLeaveRequest($_POST['denyLeaveID'],$_POST['denyLeaveToken']);
+                }
             }
-            if (isset($_GET['mcDeny']) && $_GET['mcDeny'] === 'true') {
-                denyMcRequest();
+            if (isset($_POST['denyMc']) && $_POST['denyMc'] === 'Deny') {
+                if(!empty($_POST['denyMcID']) && !empty($_POST['denyMcToken'])){
+                    denyMcRequest($_POST['denyMcID'],$_POST['denyMcToken']);
+                }
             }
-            if (isset($_GET['leaveApproval']) && $_GET['leaveApproval'] === 'true') {
-                approveLeaveRequest();
+            if (isset($_POST['approveLeave']) && $_POST['approveLeave'] === 'Approve') {
+                if(!empty($_POST['approveLeaveID']) && !empty($_POST['approveLeaveUserId']) && !empty($_POST['approveLeaveStartDate']) && !empty($_POST['approveLeaveEndDate']) && !empty($_POST['approveLeaveDays']) && !empty($_POST['approveLeaveToken'])){
+                    approveLeaveRequest($_POST['approveLeaveID'],$_POST['approveLeaveUserId'],$_POST['approveLeaveStartDate'],$_POST['approveLeaveEndDate'],$_POST['approveLeaveDays'],$_POST['approveLeaveToken']);
+                }
             }
-            if (isset($_GET['mcApproval']) && $_GET['mcApproval'] === 'true') {
-                approveMcRequest();
+            if (isset($_POST['approveMc']) && $_POST['approveMc'] === 'Approve') {
+                if(!empty($_POST['approveMcID']) && !empty($_POST['approveMcUserId']) && !empty($_POST['approveMcStartDate']) && !empty($_POST['approveMcEndDate']) && !empty($_POST['approveMcDays']) && !empty($_POST['approveMcToken'])){
+                    approveMcRequest($_POST['approveMcID'],$_POST['approveMcUserId'],$_POST['approveMcStartDate'],$_POST['approveMcEndDate'],$_POST['approveMcDays'],$_POST['approveMcToken']);
+                }
             }
-
             //connection to internalhr database
             try {
                 $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -184,12 +214,14 @@
                         <input type='hidden' name='approveLeaveStartDate' value=".strtotime($startDate).">
                         <input type='hidden' name='approveLeaveEndDate' value=".strtotime($endDate).">
                         <input type='hidden' name='approveLeaveDays' value=".$Days.">
+                        <input type='hidden' name='approveLeaveToken' value=".$csrfToken.">
                         <input type='submit' name='approveLeave' value='Approve'>
                     </form>
                 </td>
                 <td>
                     <form action='authoriseLeave.php' method='POST'>
                         <input type='hidden' name='denyLeaveID' value=".$id.">
+                        <input type='hidden' name='denyLeaveToken' value=".$csrfToken.">
                         <input type='submit' name='denyLeave' value='Deny'>
                     </form>
                 </td></tr>";
@@ -222,12 +254,14 @@
                         <input type='hidden' name='approveMcStartDate' value=".strtotime($startDate2).">
                         <input type='hidden' name='approveMcEndDate' value=".strtotime($endDate2).">
                         <input type='hidden' name='approveMcDays' value=".$Days2.">
+                        <input type='hidden' name='approveMcToken' value=".$csrfToken.">
                         <input type='submit' name='approveMc' value='Approve'>
                     </form>
                 </td>
                 <td>
                     <form action='authoriseLeave.php' method='POST'>
                         <input type='hidden' name='denyMcID' value=".$id2.">
+                        <input type='hidden' name='denyMcToken' value=".$csrfToken.">
                         <input type='submit' name='denyMc' value='Deny'>
                     </form>
                 </td></tr>";
@@ -236,6 +270,8 @@
             include "footer.php";
         }
         else{
+            unset($_SESSION['token']);
+            unset($_SESSION['tokenTime']);
             echo "Error: Denied access.";
             die();
         }

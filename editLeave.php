@@ -15,7 +15,7 @@
     require "config.php";
     require "userFunctions.php";
     session_start();
-    if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
+    if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || !isset($_SESSION['leaveID'])){
        echo "Must be logged in.";
         die();
     }

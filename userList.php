@@ -14,6 +14,26 @@
     require "config.php";
     require "userFunctions.php";
     session_start();
+    if(isset($_SESSION['token']) && isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['pageName'])){
+            if($_SESSION['pageName'] == "userList.php"){
+                $csrfToken = $_SESSION['token'];
+            }
+            else{
+                $csrfToken = hash("sha256",uniqid(rand(), TRUE));
+                $_SESSION['token'] = $csrfToken;
+                $_SESSION['tokenTime'] = time();
+                $_SESSION['pageName'] = "userList.php";
+            }
+        }
+    }
+    else{
+        $csrfToken = hash("sha256",uniqid(rand(), TRUE));
+        $_SESSION['token'] = $csrfToken;
+        $_SESSION['tokenTime'] = time();
+        $_SESSION['pageName'] = "userList.php";
+    }
+
     if (isset($_SESSION["ID"]) && isset($_SESSION["role"]) && $_SESSION["role"]==="USER-ADMIN"){
 
         if (isset($_POST['editUser']) && $_POST['editUser'] === 'Edit') {
@@ -24,8 +44,8 @@
             }
         }
         if (isset($_POST['deleteUser']) && $_POST['deleteUser'] === 'Delete') {
-            if(!empty($_POST['deleteUserID'])){
-                deleteItem($_POST['deleteUserID']);
+            if(!empty($_POST['deleteUserID']) && !empty($_POST['deleteToken'])){
+                deleteItem($_POST['deleteUserID'],$_POST['deleteToken']);
             }
         }
         //connection to internalhr database
@@ -73,6 +93,7 @@
             <td>
                 <form action='userList.php' method='POST'>
                     <input type='hidden' name='deleteUserID' value=".$id.">
+                    <input type='hidden' name='deleteToken' value=".$csrfToken.">
                     <input type='submit' name='deleteUser' value='Delete'>
                 </form>
             </td></tr>";

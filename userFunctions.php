@@ -239,8 +239,40 @@ function edituser($email, $password,$firstname, $lastname, $dateofbirth, $contac
 	}
 }
 // deletion of accounts
-function deleteItem($userId) {
+function deleteItem($userId,$csrfToken) {
 	require "config.php";
+	$elapsedTokenTime = time() - $_SESSION['tokenTime'];
+    if(!isset($_SESSION['token'])){
+        if(isset($_SESSION['tokenTime'])){
+            unset($_SESSION['tokenTime']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif(!isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['token'])){
+            unset($_SESSION['token']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif($_SESSION['token'] != $csrfToken){
+        echo "Invalid Request.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    elseif($elapsedTokenTime >= 300){
+        echo "Request expired.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    else{
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+    }
+
 	try {
 		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
 		}

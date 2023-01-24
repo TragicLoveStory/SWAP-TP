@@ -55,9 +55,10 @@
     <?php if($_SESSION['ID'] == $row['userId']) : ?>
         <div class='container forumTable'>
             <table class='forumTable2'>
-                <tr><th>Email</th><th>Title</th><th>Content</th><th>Created on</th><th>Last edited</th><th>View count</th></tr>
+                <tr><th>Email</th><th>Name</th><th>Title</th><th>Content</th><th>Created on</th><th>Last edited</th><th>View count</th></tr>
                 <tr>
                     <td><?= $row['email'] ?></td>
+                    <td><?= $row['first_name']." ".$row['last_name'] ?></td>
                     <td><?= $row['title'] ?></td>
                     <td class="Content"><span style="white-space: pre-wrap;"><?= $row['content'] ?></td>
                     <td><?= $row['createOn'] ?></td>
@@ -79,9 +80,10 @@
     <?php else : ?>
         <div class='container forumTable'>
             <table class='forumTable2'>
-                <tr><th>Email</th><th>Title</th><th>Content</th><th>Created on</th><th>Last edited</th><th>View count</th></tr>
+                <tr><th>Email</th><th>Name</th><th>Title</th><th>Content</th><th>Created on</th><th>Last edited</th><th>View count</th></tr>
                 <tr>
                     <td><?= $row['email'] ?></td>
+                    <td><?= $row['first_name']." ".$row['last_name'] ?></td>
                     <td><?= $row['title'] ?></td>
                     <td class="Content"><span style="white-space: pre-wrap;"><?= $row['content'] ?></td>
                     <td><?= $row['createOn'] ?></td>
@@ -147,18 +149,19 @@
     }
     echo "<p style='text-align: center;'>Comments:</p>";
 
-    $query2=$con->prepare("SELECT comments.ID, comments.userId, comments.forumId, users.first_name, comments.comment, comments.createOn,users.department, users.role FROM comments INNER JOIN users ON comments.userId = users.ID WHERE comments.forumId = ?"); 
+    $query2=$con->prepare("SELECT comments.ID, comments.userId, comments.forumId, users.email, users.first_name, users.last_name, comments.comment, comments.createOn,users.department, users.role FROM comments INNER JOIN users ON comments.userId = users.ID WHERE comments.forumId = ?"); 
     $query2->bind_param('i',$_GET['forumID']);
     if($query2->execute()){ //executing query (processes and print the results)
         $result2 = $query2->get_result();
         echo "<div class='container commentTable'>
         <table class='forumTable2'>
-            <tr><th>Comment ID</th><th>User ID</th><th>Forum ID</th><th>First Name</th><th>Comment</th><th>Created On</th><th>Department</th><th>Role</th><th>Rating</th></tr>";
+            <tr><th>Email</th><th>Name</th><th>Comment</th><th>Created On</th><th>Department</th><th>Role</th><th>Rating</th></tr>";
         while ($row2 = $result2->fetch_assoc()) {
             $id = $row2['ID'];
             $userId = $row2['userId'];
             $forumId = $row2['forumId'];
-            $first_name = $row2['first_name'];
+            $email = $row2['email'];
+            $name = $row2['first_name']." ".$row2['last_name'];
             $comment = $row2['comment'];
             $createOn = $row2['createOn'];
             $department = $row2['department'];
@@ -193,7 +196,7 @@
 
             if($_SESSION['ID'] === $row2['userId']){
                 echo
-                    "<tr><td>$id</td><td>$userId</td><td>$forumId</td><td>$first_name</td><td>$comment</td><td>$createOn</td><td>$department</td><td>$role</td><td>$likeCounter</td>
+                    "<tr><td>$email</td><td>$name</td><td>$comment</td><td>$createOn</td><td>$department</td><td>$role</td><td>$likeCounter</td>
                 <td>
                 <form action=".$fullUri." method='POST'>
                     <input type='hidden' name='likeCommentID' value=".$id.">
@@ -220,7 +223,7 @@
                 </td></tr>"; 
             }
             else {
-                echo "<tr><td>$id</td><td>$userId</td><td>$forumId</td><td>$first_name</td><td>$comment</td><td>$createOn</td><td>$department</td><td>$role</td><td>$likeCounter</td>
+                echo "<tr><td>$email</td><td>$name</td><td>$comment</td><td>$createOn</td><td>$department</td><td>$role</td><td>$likeCounter</td>
                 <td>
                 <form action=" . $fullUri . " method='POST'>
                     <input type='hidden' name='likeCommentID' value=" . $id . ">

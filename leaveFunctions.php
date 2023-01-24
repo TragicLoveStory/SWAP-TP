@@ -176,8 +176,40 @@ function deleteLeave($leaveID){
     }  
 }
 
-function denyLeaveRequest($leaveID){
+function denyLeaveRequest($leaveID,$csrfToken){
     require "config.php";
+    $elapsedTokenTime = time() - $_SESSION['tokenTime'];
+    if(!isset($_SESSION['token'])){
+        if(isset($_SESSION['tokenTime'])){
+            unset($_SESSION['tokenTime']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif(!isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['token'])){
+            unset($_SESSION['token']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif($_SESSION['token'] != $csrfToken){
+        echo "Invalid Request.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    elseif($elapsedTokenTime >= 300){
+        echo "Request expired.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    else{
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+    }
+
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
         }
@@ -201,8 +233,40 @@ function denyLeaveRequest($leaveID){
     }
 }
 
-function denyMcRequest($MCID){
+function denyMcRequest($MCID,$csrfToken){
     require "config.php";
+    $elapsedTokenTime = time() - $_SESSION['tokenTime'];
+    if(!isset($_SESSION['token'])){
+        if(isset($_SESSION['tokenTime'])){
+            unset($_SESSION['tokenTime']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif(!isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['token'])){
+            unset($_SESSION['token']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif($_SESSION['token'] != $csrfToken){
+        echo "Invalid Request.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    elseif($elapsedTokenTime >= 300){
+        echo "Request expired.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    else{
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+    }
+
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
         }
@@ -226,8 +290,40 @@ function denyMcRequest($MCID){
     }
 }
 
-function approveLeaveRequest($leaveID,$userID,$startDate,$endDate,$totalDays){
+function approveLeaveRequest($leaveID,$userID,$startDate,$endDate,$totalDays,$csrfToken){
     require "config.php";
+    $elapsedTokenTime = time() - $_SESSION['tokenTime'];
+    if(!isset($_SESSION['token'])){
+        if(isset($_SESSION['tokenTime'])){
+            unset($_SESSION['tokenTime']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif(!isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['token'])){
+            unset($_SESSION['token']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif($_SESSION['token'] != $csrfToken){
+        echo "Invalid Request.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    elseif($elapsedTokenTime >= 300){
+        echo "Request expired.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    else{
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+    }
+
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
         }
@@ -287,8 +383,40 @@ function approveLeaveRequest($leaveID,$userID,$startDate,$endDate,$totalDays){
     }
 }
 
-function approveMcRequest($MCID,$userID,$startDate,$endDate,$totalDays){
+function approveMcRequest($MCID,$userID,$startDate,$endDate,$totalDays,$csrfToken){
     require "config.php";
+    $elapsedTokenTime = time() - $_SESSION['tokenTime'];
+    if(!isset($_SESSION['token'])){
+        if(isset($_SESSION['tokenTime'])){
+            unset($_SESSION['tokenTime']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif(!isset($_SESSION['tokenTime'])){
+        if(isset($_SESSION['token'])){
+            unset($_SESSION['token']);
+        }
+        echo "Invalid.";
+        die();
+    }
+    elseif($_SESSION['token'] != $csrfToken){
+        echo "Invalid Request.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    elseif($elapsedTokenTime >= 300){
+        echo "Request expired.";
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+        die();
+    }
+    else{
+        unset($_SESSION['token']);
+        unset($_SESSION['tokenTime']);
+    }
+
     try {
         $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
         }

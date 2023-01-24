@@ -14,7 +14,7 @@
         require "userfunctions.php";
         $uri = $_SERVER['REQUEST_URI'];
         $fullUri = "https://localhost${uri}";
-        if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"])){
+        if (!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || !isset($_SESSION['safetyID'])){
             echo "Must be logged in.";
             die();
         }

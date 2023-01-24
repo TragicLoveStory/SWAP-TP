@@ -10,69 +10,72 @@
 <body>
     <?php 
         session_start();
+        require "userfunctions.php";
+        require "config.php";
         if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !=="USER-ADMIN"){
             echo "Only permitted for User Admins.";
             die();
         }
+        include "navbar.php";
+        $errorMessage="";
         if(isset($_POST['Submit']) && $_POST['Submit'] === "Create Account"){
             if(!empty($_POST['email']) && !empty($_POST['password']) && !empty($_POST['firstname']) && !empty($_POST['lastname']) && !empty($_POST['dateofbirth']) && !empty($_POST['contact']) && !empty($_POST['department'])){
                 require_once "userFunctions.php";
                 adduser($_POST['email'],$_POST['password'],$_POST['firstname'],$_POST['lastname'], $_POST['dateofbirth'],$_POST['contact'],$_POST['department'],$_POST['occupation']);
             } 
             else{
-                echo "Error: No fields should be empty<br>";
+                $errorMessage="Error: No fields should be empty<br>";
             }
         }
     ?>
-
-    <form action="registerAccount.php" method='post'>
-    <table style='text-align: left; margin-left: auto; margin-right: auto;'>
-    <tr>
-        <th></th>
-        <th style='text-align: center;'>Create An Account</th>
-    </tr>
-    <tr>
-        <td><label for='email'>Email:</label></td>
-        <td><input type='text' name='email'><br></td>
-    </tr>
-    <tr>
-        <td><label for='password'>Password:</label></td>
-        <td><input type='text' name='password'><br></td>
-    </tr>
-    <tr>
-        <td><label for='firstname'>First Name:</label></td>
-        <td><input type='text' name='firstname'><br></td>
-    </tr>
-    <tr>
-        <td><label for='lastname'>Last Name:</label></td>
-        <td><input type='text' name='lastname'><br></td>
-    </tr>
-    <tr>
-        <td><label for='dateofbirth'>Date Of Birth:</label></td>
-        <td><input type='date' name='dateofbirth'  min="1900-01-01" max="<?= date('Y-m-d'); ?>" value="<?= date('Y-m-d'); ?>"><br></td>
-    </tr>
-    <tr>
-        <td><label for='contact'>Contact (+65):</label></td>
-        <td><input type='text' name='contact'><br></td>
-    </tr>
-    <tr>
-        <td><label for='department'>Department:</label></td>
-        <td><input type='text' name='department'><br></td>
-    </tr>
-    <tr>
-        <td><label for='occupation'>Occupation:</label></td>
-        <td><input type='text' name='occupation'><br></td>
-    </tr>
-    <!-- <tr>
-        <td><label for='role'>Role:</label></td>
-        <td><input type='text' name='role'><br></td>
-    </tr> -->
-    <tr>
-        <td></td>
-        <td style='text-align: right;'><input type='submit' value='Create Account' name='Submit'></td>
-    </tr>  
-    </table>
-    </form>
+    <div class='container editUserDivision'>
+        <p style='text-align: center;'><?= $errorMessage ?></p>
+        <form action="registerAccount.php" method='post'>
+        <table style='text-align: left; margin-left: auto; margin-right: auto;'>
+        <tr>
+            <th></th>
+            <th style='text-align: center;'>Create An Account</th>
+        </tr>
+        <tr>
+            <td><label for='email'>Email:</label></td>
+            <td><input type='text' name='email'><br></td>
+        </tr>
+        <tr>
+            <td><label for='password'>Password:</label></td>
+            <td><input type='password' name='password'><br></td>
+        </tr>
+        <tr>
+            <td><label for='firstname'>First Name:</label></td>
+            <td><input type='text' name='firstname'><br></td>
+        </tr>
+        <tr>
+            <td><label for='lastname'>Last Name:</label></td>
+            <td><input type='text' name='lastname'><br></td>
+        </tr>
+        <tr>
+            <td><label for='dateofbirth'>Date Of Birth:</label></td>
+            <td><input type='date' name='dateofbirth'  min="1900-01-01" max="<?= date('Y-m-d'); ?>" value="<?= date('Y-m-d'); ?>"><br></td>
+        </tr>
+        <tr>
+            <td><label for='contact'>Contact:</label></td>
+            <td><input type='text' name='contact'><br></td>
+        </tr>
+        <tr>
+            <td><label for='department'>Department:</label></td>
+            <td><input type='text' name='department'><br></td>
+        </tr>
+        <tr>
+            <td><label for='occupation'>Occupation:</label></td>
+            <td><input type='text' name='occupation'><br></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td style='text-align: right;'><input type='submit' value='Create Account' name='Submit'></td>
+        </tr>  
+        </table>
+        </form>
+    </div>
+    <?php include "footer.php" ?>
 </body>
 <!-- JavaScript Bundle with Popper -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

@@ -14,7 +14,7 @@
     session_start();
     require "config.php";
     require "userfunctions.php";
-    if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !="USER-ADMIN"){
+    if(!isset($_SESSION["ID"]) || !isset($_SESSION["role"]) || $_SESSION["role"] !="USER-ADMIN" || !isset($_SESSION['editUserId'])){
         echo "Only permitted for User Admins.";
         die();
     } 
