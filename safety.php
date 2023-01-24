@@ -49,7 +49,7 @@
         <tr><th>Safety ID</th><th>Title</th><th>Safety Content</th><th>Video link</th><th>Created on</th><th>Last Edited</th></tr>";
         while($query->fetch())
         {
-            echo "<tr><td>$id</td><td><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></td><td>$safetyContent</td><td><a href==".$videoLink.">$videoLink</a></td><td>$createOn</td><td>$lastEdited</td>
+            echo "<tr><td>$id</td><td><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></td><td>$safetyContent</td><td><a href=".$videoLink.">$videoLink</a></td><td>$createOn</td><td>$lastEdited</td>
             <td>
                 <form action='Safety.php' method='POST'>
                     <input type='hidden' name='editSafetyID' value=".$id.">
@@ -89,7 +89,7 @@
         <tr><th>Safety ID</th><th>Title</th><th>Safety Content</th><th>Video link</th><th>Created on</th><th>Last Edited</th></tr>";
         while($query->fetch())
         {
-            echo "<tr><td>$id</td><td><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></td><td>$safetyContent</td><td><a href==".$videoLink.">$videoLink</a></td><td>$createOn</td><td>$lastEdited</td></td></tr>";
+            echo "<tr><td>$id</td><td><a href='safetyThread.php?safetyID=".$id."'>$safetyTitle</a></td><td>$safetyContent</td><td><a href=".$videoLink.">$videoLink</a></td><td>$createOn</td><td>$lastEdited</td></td></tr>";
         }
         echo "</table></div>";
         include "footer.php";
