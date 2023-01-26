@@ -112,7 +112,7 @@ function checkAttempt($emailInput){ //lockout system
 				die();
 			}
 		}
-		elseif($failedAttempts == 5 && $row['elapsedtime'] < 600){ //lockout for 10 minutes
+		elseif($failedAttempts == 5 && $row['elapsedtime'] < 300){ //lockout for 10 minutes
 			$status = 1;
 			$newFailedAttempts = 0;
 			$newLastFailed = "";
