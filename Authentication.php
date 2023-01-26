@@ -54,6 +54,32 @@ function attendanceCheck($ID){
 	}	
 }
 
+function logAttempt($emailInput,$logStatus){
+	require "config.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	// status = 1: successful login
+	// status = 0: failed login
+	// status = -1: failed in logging attempt (-1 is default value)
+	$query=$con->prepare("INSERT INTO `logattempts` (`email`,`logStatus`) VALUES (?,?)");
+	$query->bind_param('si',$emailInput,$logStatus);
+	if($query->execute()){ 
+	}
+	else{
+		echo "Logging Error.";
+		die();
+	}
+}
+
 function login($email,$password,$recaptcha){
     require "config.php";
     require "userFunctions.php";
@@ -78,6 +104,8 @@ function login($email,$password,$recaptcha){
 		//htmlspecialchars the password input as we sanitized the password input before INSERT into database.
         if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || !password_verify($password,htmlspecialchars($row['password']))){
 			//function fails, shows error message
+			$logStatus = 0;
+			logAttempt($email,$logStatus); //log failed login attempt
         }
         else{
 			$secret_key = '6Lc9GR0kAAAAAOuYLevKn3oYBIErSwwKb70Wr3up';
@@ -95,7 +123,7 @@ function login($email,$password,$recaptcha){
 				echo "<p class='AlreadyLoggedInText'>Captcha Failure.</p>";
 				die();
 			} 
-
+			// checks if OTP is enabled
 			if($row['otp'] == 1){
 				$key = "82734ywehfgagjlwenfgwuipth2498579efgo29835yrehgjkreng";
 				$initializationIV = "";
@@ -113,6 +141,10 @@ function login($email,$password,$recaptcha){
 				include "mailFunctions.php";
 				sendOTP($email);
 			}
+
+			$logStatus = 1;
+			logAttempt($email,$logStatus); //log successful login attempt
+
 			session_destroy(); //destroy the session created at loginForm.php
 			attendanceCheck($row['ID']); // take attendance for that day
 			session_set_cookie_params([ 
@@ -162,7 +194,9 @@ function login($email,$password,$recaptcha){
         }
 	}
 	else{
-		printerror("Selecting $db_database",$con);
+		echo "Login Error.";
+		die();
+		//printerror("Selecting $db_database",$con);
 	}
 }
 
@@ -226,7 +260,9 @@ function firstPasswordChange($passwordInput,$confirmPasswordInput){
 		logout();
 	}
 	else{
-		printerror("Selecting $db_database",$con);
+		echo "First password change error.";
+		die();
+		//printerror("Selecting $db_database",$con);
 	}
 }
 
@@ -278,6 +314,9 @@ function otpLogin($inputOTP){
 			die();
         }
         else{
+			$logStatus = 1;
+			logAttempt($decryptedvalue,$logStatus); //log successful login attempt
+
 			attendanceCheck($row['ID']);
             printok("Login Successful");
 			session_set_cookie_params([
@@ -326,7 +365,9 @@ function otpLogin($inputOTP){
         }
 	}
 	else{
-		printerror("Selecting $db_database",$con);
+		echo "Login Error.";
+		die();
+		//printerror("Selecting $db_database",$con);
 	}
 }
 ?>
