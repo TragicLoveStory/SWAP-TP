@@ -46,7 +46,7 @@ function attendanceCheck($ID){
 		$date = date('Y-m-d H:i:s', time());
 		$query2->bind_param('iis',$ID,$workAttendance,$date);
 		if($query2->execute()){
-			printok("Attendance Updated.");
+			//printok("Attendance Updated.");
 		}
 		else{
 			printerror("Selecting $db_database",$con);
@@ -80,6 +80,142 @@ function logAttempt($emailInput,$logStatus){
 	}
 }
 
+function checkAttempt($emailInput){ //lockout system
+	require "config.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	$query=$con->prepare("SELECT `failedAttempts`,`lastFailed`,`elapsedtime` FROM `users` WHERE `email`=?");
+	$query->bind_param('s',$emailInput);
+	if($query->execute()){ 
+		$result = $query->get_result();
+        $row = $result->fetch_assoc();
+		$failedAttempts = $row['failedAttempts'] + 1;
+		if($failedAttempts >5){ //lockout for 10 minutes
+			$status = 1;
+			$newFailedAttempts = 0;
+			$newLastFailed = "";
+			$newLockoutTime = time();
+			$elapsedTime = 300;
+			$query2=$con->prepare("UPDATE `users` SET `failedAttempts` = ?, `lastFailed` = ?, `elapsedtime` = ?, `lockoutTime`=?, `lockoutStatus`=? WHERE `email` = ?");
+			$query2->bind_param('isisss',$newFailedAttempts,$newLastFailed,$elapsedTime,$newLockoutTime,$status, $emailInput);
+			if($query2->execute()){
+				echo "<p class='AlreadyLoggedInText'>Failed too many login attempts. This account is now locked out. <a href='loginForm.php'>Redirect Here:</a></p>";
+				die();
+			}
+		}
+		elseif($failedAttempts == 5 && $row['elapsedtime'] < 600){ //lockout for 10 minutes
+			$status = 1;
+			$newFailedAttempts = 0;
+			$newLastFailed = "";
+			$newLockoutTime = time();
+			$elapsedTime = 300;
+			$query3=$con->prepare("UPDATE `users` SET `failedAttempts` = ?, `lastFailed` = ?, `elapsedtime` = ?, `lockoutTime`=?, `lockoutStatus`=? WHERE `email` = ?");
+			$query3->bind_param('isisss',$newFailedAttempts,$newLastFailed,$elapsedTime,$newLockoutTime,$status,$emailInput);
+			if($query3->execute()){
+				echo "<p class='AlreadyLoggedInText'>Failed too many login attempts. This account is now locked out. <a href='loginForm.php'>Redirect Here:</a></p>";
+				die();
+			}
+		}
+		elseif($failedAttempts == 1){ // add 1 failed attempt, update lastFailed 
+			$newLastFailed = time();
+			$elapsedTime = 0;
+			$query4=$con->prepare("UPDATE `users` SET `failedAttempts` = ?, `lastFailed` = ?, `elapsedtime` = ? WHERE `email` = ?");
+			$query4->bind_param('isis',$failedAttempts,$newLastFailed,$elapsedTime,$emailInput);
+			if($query4 ->execute()){
+			}
+		}
+		else{
+			$newLastFailed = time();
+			$elapsedTime = $newLastFailed - $row['lastFailed'];
+			$newElapsedTime = $elapsedTime + $row['elapsedtime'];
+			$query5=$con->prepare("UPDATE `users` SET `failedAttempts` = ?, `lastFailed` = ?, `elapsedtime` = ? WHERE `email` = ?");
+			$query5->bind_param('isis',$failedAttempts,$newLastFailed,$newElapsedTime,$emailInput);
+			if($query5->execute()){
+			}
+		}
+		
+	}
+	else{
+		echo "Logging Error.";
+		die();
+	}
+}
+
+function checkLockout($emailInput){ //check lockout time left
+	require "config.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	$query=$con->prepare("SELECT `elapsedtime`,`lockoutTime` FROM `users` WHERE `email`=?");
+	$query->bind_param('s',$emailInput);
+	if($query->execute()){
+		$result = $query->get_result();
+        $row = $result->fetch_assoc();
+		$currentTime = time();
+		$elapsedTime = $currentTime - $row['lockoutTime'];
+
+		if($elapsedTime >= $row['elapsedtime']){
+			$newStatus = 0;
+			$resetElapsedTime = 0;
+			$resetLockoutTime = "";
+			$query2=$con->prepare("UPDATE `users` SET `elapsedtime` = ?, `lockoutTime`=?, `lockoutStatus` =? WHERE `email` = ?");
+			$query2->bind_param('isis',$resetElapsedTime,$resetLockoutTime,$newStatus,$emailInput);
+			if($query2->execute()){}
+		}
+
+		else{
+			$newElapsedTime = $row['elapsedtime'] - $elapsedTime;
+			$query2=$con->prepare("UPDATE `users` SET `elapsedtime` = ? WHERE `email` = ?");
+			$query2->bind_param('is',$newElapsedTime,$emailInput);
+			if($query2->execute()){
+				echo "<p class='AlreadyLoggedInText'>Account Locked out. Time Left: ".$newElapsedTime.". <a href='loginForm.php'>Redirect Here:</a></p>";
+				die();
+			}
+		}
+
+	}
+}
+
+function resetAttempt($emailInput){ //reset all fields when login successfully
+	require "config.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	$resetStatus = 1;
+	$resetFailedAttempts = 0;
+	$resetLastFailed = "";
+	$resetElapsedTime = 0;
+	$resetLockoutTime = "";
+	$query=$con->prepare("UPDATE `users` SET `failedAttempts` = ?,`lastFailed` = ?,`elapsedtime` = ?, `lockoutTime`=?, `lockoutStatus` = ? WHERE `email` = ?");
+	$query->bind_param('iisiss',$resetFailedAttempts,$resetLastFailed,$resetElapsedTime,$resetLockoutTime,$resetStatus,$emailInput);
+	if($query->execute()){}
+}
+
 function login($email,$password,$recaptcha){
     require "config.php";
     require "userFunctions.php";
@@ -101,13 +237,20 @@ function login($email,$password,$recaptcha){
     if($query->execute()){ //executing query (processes and print the results)
         $result = $query->get_result();
         $row = $result->fetch_assoc();
+		if($row['lockoutStatus'] == 1){
+			checkLockout($email);
+		}
+
 		//htmlspecialchars the password input as we sanitized the password input before INSERT into database.
         if(empty($row['email']) || empty($row['password']) || $row['email'] !== $email || !password_verify($password,htmlspecialchars($row['password']))){
 			//function fails, shows error message
 			$logStatus = 0;
 			logAttempt($email,$logStatus); //log failed login attempt
+			checkAttempt($email);
         }
         else{
+			resetAttempt($email);
+
 			$secret_key = '6Lc9GR0kAAAAAOuYLevKn3oYBIErSwwKb70Wr3up';
 			// Hitting request to the URL, Google will
     		// respond with success or error scenario
@@ -316,6 +459,7 @@ function otpLogin($inputOTP){
         else{
 			$logStatus = 1;
 			logAttempt($decryptedvalue,$logStatus); //log successful login attempt
+			resetAttempt($decryptedvalue); //reset anything failed attempts just in case
 
 			attendanceCheck($row['ID']);
             printok("Login Successful");
