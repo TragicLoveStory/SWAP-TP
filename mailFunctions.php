@@ -16,8 +16,9 @@ function contactMail($subject,$body){
 function forgotPassword($email){
     $randomString = generateRandomString();
     $receiver = $email;
+    $currentTime = date("Y:m:d h:i:s");
     $subject = "Reset your password";
-    $body = "We received a request for a password change. Create a new password by clicking the link below.\r\nhttps://localhost/SWAP-TP/resetPassword.php?s=".$randomString;
+    $body = "We received a request for a password change at ".$currentTime.". Create a new password by clicking the link below.\r\nhttps://localhost/SWAP-TP/resetPassword.php?s=".$randomString;
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
         echo "<p class='AlreadyLoggedInText'>Email successfully sent to ".$receiver."</p>";
@@ -137,8 +138,9 @@ function sendOTP($email){
     date_default_timezone_set('Singapore');
     $generatedOTP = generateOTP();
     $receiver = $email;
+    $currentTime = date("Y:m:d h:i:s");
     $subject = "OTP";
-    $body = "Hello ".$email.", as OTP is enabled for your TPAMC account, we have sent an OTP for your recent login attempt below.\r\n".$generatedOTP;
+    $body = "Hello ".$email.", as OTP is enabled for your TPAMC account, we have sent an OTP for your recent login attempt at ".$currentTime." below.\r\n".$generatedOTP;
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
         //echo "Email sent successfully to $receiver";
