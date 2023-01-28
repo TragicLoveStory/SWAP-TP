@@ -452,4 +452,68 @@ function disableOTP(){
 		echo "Error Executing Query";
 	}
 }
+
+function changePassword($currentPassword,$newPassword){
+	require "config.php";
+	require "Authentication.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	$query=$con->prepare("SELECT `password` FROM `users` WHERE `ID` =?");
+	$query->bind_param('i', $_SESSION['ID']); //bind the parameters
+	if($query->execute()){
+		$result = $query-> get_result();
+		$row = $result -> fetch_assoc();
+		if(!$row){
+			echo "Error.";
+			die();
+		}
+		elseif(empty($row['password']) || !password_verify($currentPassword,htmlspecialchars($row['password']))){
+			echo "<p class='AlreadyLoggedInText'>Incorrect Current Password2.</p>";
+			die();
+		}
+		else{
+			// min & max length input validation
+			if(strlen($newPassword) > 30){
+				echo "<p class='AlreadyLoggedInText'>".$newPassword." is too long!.</p>";
+				die();
+			}
+			elseif(strlen($newPassword) < 10){
+				echo "<p class='AlreadyLoggedInText'>".$newPassword." is too short!.</p>";
+				die();
+			}
+			// regular expressions
+			$checkall = true;
+			$checkall=$checkall && inputChecker($newPassword,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); //must have lower case, upper case, special char and number
+			if (!$checkall) {
+				echo "<p class='AlreadyLoggedInText'>Passwords must contain 1 Lowercase, Uppercase, Special Character, number and at least 10 characters long</p>";
+				die();
+			}
+			// htmlspecialchars
+			$sanitizedPasswordInput = htmlspecialchars($newPassword);
+			//hashing password
+			$hashed_password = password_hash($sanitizedPasswordInput,PASSWORD_DEFAULT);
+			$query=$con->prepare("UPDATE `users` SET `password` = ? WHERE `ID`=?");
+			$query->bind_param('si',$hashed_password, $_SESSION['ID']); //bind the parameters
+			if($query->execute()){
+				logout();
+			}
+			else{
+				echo "Password change error.";
+				die();
+				//printerror("Selecting $db_database",$con);
+			}
+		}
+	}
+	else{
+		printerror("Selecting $db_database",$con);
+	}
+}
 ?>

@@ -23,6 +23,10 @@
             header("Location: https://localhost/SWAP-TP/editProfile.php");
 		    die();
         }
+        if(isset($_POST['changePassword']) && $_POST['changePassword'] === "Change Password"){
+            header("Location: https://localhost/SWAP-TP/changePassword.php");
+		    die();
+        }
         if(isset($_POST['logout']) && $_POST['logout'] === "Logout"){
             include "Authentication.php";
             logout();
@@ -90,8 +94,12 @@
             <input type="submit" name="editProfile" value="Edit Profile"><br><br>
         </form>
         <form action="profile.php" method="POST" style="text-align: center;">
+            <input type="submit" name="changePassword" value="Change Password"><br><br>
+        </form>
+        <form action="profile.php" method="POST" style="text-align: center;">
             <input type="submit" name="logout" value="Logout"><br><br>
         </form>
+
         <?php if($otpStatus == "Enabled") : ?> 
             <p>OTP: <?= $otpStatus ?></p>
             <form action="profile.php" method="POST" style="text-align: center;">

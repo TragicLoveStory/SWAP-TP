@@ -389,7 +389,7 @@ function firstPasswordChange($passwordInput,$confirmPasswordInput){
 	$checkall = true;
 	$checkall=$checkall && inputChecker($passwordInput,"/^((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s])).{10,29}$/"); //must have lower case, upper case, special char and number
 	if (!$checkall) {
-		echo "<p class='AlreadyLoggedInText'>Incorrect Input. Must contain 1 Lowercase, Uppercase, Special Character, number and 10 characters long</p>";
+		echo "<p class='AlreadyLoggedInText'>Incorrect Input. Must contain 1 Lowercase, Uppercase, Special Character, number and at least 10 characters long</p>";
 		die();
 	}
 	// htmlspecialchars
