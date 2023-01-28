@@ -17,7 +17,7 @@ function forgotPassword($email){
     $randomString = generateRandomString();
     $receiver = $email;
     $subject = "Reset your password";
-    $body = "We received a request for a password change. Create a new password by clicking the link below.\r\nlocalhost/SWAP-TP/resetPassword.php?s=".$randomString;
+    $body = "We received a request for a password change. Create a new password by clicking the link below.\r\nhttps://localhost/SWAP-TP/resetPassword.php?s=".$randomString;
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
         echo "<p class='AlreadyLoggedInText'>Email successfully sent to ".$receiver."</p>";
