@@ -1,11 +1,11 @@
 <?php 
 function contactMail($subject,$body){
-    $receiver = $_SESSION['email'];
+    $receiver = "ashwynoh@gmail.com";
     // $subject = "Email Test via PHP using Localhost";
     // $body = "Hi, there...This is a test email send from Localhost.";
     $sender = "From:parcelofjoy@gmail.com";
     if(mail($receiver, $subject, $body, $sender)){
-        echo "<p class='AlreadyLoggedInText'>Email successfully sent to ".$receiver."</p>";
+        echo "<p class='AlreadyLoggedInText'>Email successfully sent to the HR Team.</p>";
         die();
     }else{
         echo "<p class='AlreadyLoggedInText'>Error: failed while sending mail</p>";
