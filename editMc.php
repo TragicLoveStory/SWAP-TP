@@ -31,13 +31,12 @@
             die();
         }
         if(!empty($_POST['mcDays']) && !empty($_POST['startDate']) && !empty($_POST['endDate']) && !empty($_FILES['editMC'])){
-            editMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
             $start = new DateTime(date('Y-m-d',strtotime($_POST['startDate'])));
             $end = new DateTime(date('Y-m-d',strtotime($_POST['endDate'])));
             $days  = $end->diff($start)->format('%a');
             $days+=1;
             if($_POST['mcDays'] == $days){
-                submitMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
+                editMC($_POST['mcDays'],$_POST['startDate'],$_POST['endDate']);
             }
             else{
                 echo "<p class='AlreadyLoggedInText'>Number of days does not match start and end date.</p>";
