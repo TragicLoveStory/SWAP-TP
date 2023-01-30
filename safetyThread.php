@@ -39,6 +39,11 @@
         if($query->execute()){ //executing query (processes and print the results)
             $result = $query->get_result();
             $row = $result->fetch_assoc(); 
+            if(!$row){
+                echo "Error.";
+                include "footer.php";
+                die();
+            }
         }
     ?>
     <div class='container safetyThreadTable'>

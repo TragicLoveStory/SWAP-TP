@@ -47,6 +47,11 @@
         if($query->execute()){ //executing query (processes and print the results)
             $result = $query->get_result();
             $row = $result->fetch_assoc();
+            if(!$row){
+                echo "Error.";
+                include "footer.php";
+                die();
+            }
         }
         viewCounter($row['viewCount'],$_GET['forumID']);
         $uri = $_SERVER['REQUEST_URI'];

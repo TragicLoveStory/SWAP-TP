@@ -16,6 +16,7 @@ function contactMail($subject,$body){
 function forgotPassword($email){
     $randomString = generateRandomString();
     $receiver = $email;
+    date_default_timezone_set('Asia/Singapore');
     $currentTime = date("Y:m:d h:i:s");
     $subject = "Reset your password";
     $body = "We received a request for a password change at ".$currentTime.". Create a new password by clicking the link below.\r\nhttps://localhost/SWAP-TP/resetPassword.php?s=".$randomString;
