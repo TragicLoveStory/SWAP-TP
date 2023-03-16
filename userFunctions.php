@@ -1,4 +1,5 @@
 <?php	// Creates the user table and setup accounts
+use PragmaRX\Google2FA\Google2FA;
 
 function printerror($message, $con) {
 	echo "<pre>";
@@ -414,7 +415,7 @@ function enableOTP(){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
 
 	$otpStatus = 1;
 	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
@@ -440,7 +441,7 @@ function disableOTP(){
 		printerror("Connecting to $db_hostname", $con);
 		die();
 	}
-	else printok("Connecting to $db_hostname");
+	//else printok("Connecting to $db_hostname");
 
 	$otpStatus = -1;
 	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
@@ -453,6 +454,115 @@ function disableOTP(){
 	}
 }
 
+function enable2FA(){
+	require "config.php";
+	require "Authentication.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	//else printok("Connecting to $db_hostname");
+
+	$otpStatus = 2;
+	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
+	$query->bind_param('ii', $otpStatus, $_SESSION['ID']); //bind the parameters
+	if($query->execute()){ //executing query (processes and print the results)
+		addQRCode();
+	}
+	else{
+		echo "Error Executing Query";
+	}
+}
+
+function addQRCode(){
+	require "config.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+
+	$query=$con->prepare("SELECT * FROM `2fa` WHERE `userId` = ?");
+	$query->bind_param('i', $_SESSION['ID']); //bind the parameters
+	$query->execute();
+	$result = $query-> get_result();
+	$num_of_rows = $result->num_rows;
+	if($num_of_rows == 0){
+		$google2fa = new \PragmaRX\Google2FA\Google2FA();
+		$secret = $google2fa->generateSecretKey();
+		
+		$query2=$con->prepare("INSERT INTO `2fa` (`userId`,`secret`) VALUES (?,?)");
+		$query2->bind_param('is',$_SESSION['ID'], $secret);
+		if($query2->execute()){
+			$text = $google2fa->getQRCodeUrl(
+				'TPAMC.com',
+				$_SESSION['email'],
+				$secret
+			);
+			$image_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl='.$text;
+			$_SESSION['2faURL'] = $image_url;
+			header("Location: https://localhost/SWAP-TP/qrCode.php");
+			die();
+			
+		}
+	}
+	else{
+		$google2fa = new \PragmaRX\Google2FA\Google2FA();
+		$newSecret = $google2fa->generateSecretKey();
+
+		$query3=$con->prepare("UPDATE `2fa` SET `secret` = ? WHERE `userId`=?");
+		$query3->bind_param('si', $newSecret, $_SESSION['ID']); //bind the parameters
+		if($query3->execute()){
+			$text = $google2fa->getQRCodeUrl(
+				'TPAMC.com',
+				$_SESSION['email'],
+				$newSecret
+			);
+			$image_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl='.$text;
+			$_SESSION['2faURL'] = $image_url;
+			header("Location: https://localhost/SWAP-TP/qrCode.php");
+			die();
+			
+		}
+	}
+}
+
+function disable2FA(){
+	require "config.php";
+	require "Authentication.php";
+	try {
+		$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+		}
+	catch (Exception $e) {
+			printerror($e->getMessage(),$con);
+		}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	//else printok("Connecting to $db_hostname");
+
+	$otpStatus = -1;
+	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
+	$query->bind_param('ii', $otpStatus, $_SESSION['ID']); //bind the parameters
+	if($query->execute()){ //executing query (processes and print the results)
+		logout();
+	}
+	else{
+		echo "Error Executing Query";
+	}
+}
 function changePassword($currentPassword,$newPassword){
 	require "config.php";
 	require "Authentication.php";

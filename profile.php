@@ -37,6 +37,12 @@
         if(isset($_POST['disableOTP']) && $_POST['disableOTP'] === "Disable OTP"){
             disableOTP();
         }
+        if(isset($_POST['enable2FA']) && $_POST['enable2FA'] === "Enable 2FA"){
+            enable2FA();
+        }
+        if(isset($_POST['disable2FA']) && $_POST['disable2FA'] === "Disable 2FA"){
+            disable2FA();
+        }
 
         try {
             $con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
@@ -58,6 +64,13 @@
             }
             else{
                 $otpStatus = "Disabled";
+            }
+
+            if($row['otp'] == 2){
+                $TwoStatus = "Enabled";
+            }
+            else{
+                $TwoStatus = "Disabled";
             }
         }
         else{
@@ -111,6 +124,19 @@
                 <input type="submit" name="enableOTP" value="Enable OTP">
             </form>
         <?php endif; ?>
+
+        <?php if($TwoStatus == "Enabled") : ?> 
+            <p style='margin-top: 1rem;'>2FA: <?= $TwoStatus ?></p>
+            <form action="profile.php" method="POST" style="text-align: center;">
+                <input type="submit" name="disable2FA" value="Disable 2FA">
+            </form>
+        <?php else : ?>
+            <p style='margin-top: 1rem;'>2FA: <?= $TwoStatus ?></p>
+            <form action="profile.php" method="POST" style="text-align: center;">
+                <input type="submit" name="enable2FA" value="Enable 2FA">
+            </form>
+        <?php endif; ?>
+
     </div>
     <?php include "footer.php" ?>
 </body>

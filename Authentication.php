@@ -1,4 +1,14 @@
 <?php 
+use PragmaRX\Google2FA\Google2FA;
+use ParagonIE\ConstantTime\Base32;
+require '2FA\google2fa\src\Support\QRCode.php';
+require '2FA\google2fa\src\Support\Base32.php';
+require '2FA\google2fa\src\Support\Constants.php';
+require '2FA\google2fa\src\Google2FA.php';
+require '2FA\constant_time_encoding-2.6.3\src\EncoderInterface.php';
+require '2FA\constant_time_encoding-2.6.3\src\Base32.php';
+require '2FA\constant_time_encoding-2.6.3\src\Binary.php';
+require '2FA\constant_time_encoding-2.6.3\src\Encoding.php';
 
 function debug() {
 	echo "<pre>";
@@ -266,7 +276,8 @@ function login($email,$password,$recaptcha){
 				echo "<p class='AlreadyLoggedInText'>Captcha Failure.</p>";
 				die();
 			} 
-			// checks if OTP is enabled
+
+			// checks if either OTP or 2FA is enabled
 			if($row['otp'] == 1){
 				$key = "82734ywehfgagjlwenfgwuipth2498579efgo29835yrehgjkreng";
 				$initializationIV = "";
@@ -283,6 +294,22 @@ function login($email,$password,$recaptcha){
 				]);
 				include "mailFunctions.php";
 				sendOTP($email);
+			}
+			elseif($row['otp'] == 2){ //for 2FA
+				$key = "89345789234y5234h5234523b45k2345kb2345kj23b45kxcvb0967";
+				$initializationIV = "";
+				$AES128_ECB="aes-128-ecb";
+				$encryptedValue = openssl_encrypt($row['ID'], $AES128_ECB, $key, $options=0, $initializationIV);
+				setcookie("aobing", $encryptedValue, [
+					'expires' => time() + 1800,
+					'path' => '/SWAP-TP',
+					'domain' => '',
+					'secure' => TRUE,
+					'httponly' => TRUE,
+					'samesite' => 'Strict'
+				]);
+				header("Location: https://localhost/SWAP-TP/2FA.php");
+				die();
 			}
 
 			$logStatus = 1;
@@ -512,6 +539,95 @@ function otpLogin($inputOTP){
 		echo "Login Error.";
 		die();
 		//printerror("Selecting $db_database",$con);
+	}
+}
+
+
+
+function authenticate2FA($userId,$userInput){
+	require "config.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	
+	$query=$con->prepare("SELECT * from `2fa` WHERE `userId`=?");
+    $query->bind_param('i',$userId);
+	if($query->execute()){ 
+        $result = $query->get_result();
+        $row = $result->fetch_assoc();
+		$google2fa = new \PragmaRX\Google2FA\Google2FA();
+		if($google2fa->verifyKey($row['secret'], $userInput)){
+			//remove cookie containing encrypted userId
+			foreach ($_COOKIE as $key=>$value) {
+				foreach($_COOKIE as $key=>$value){
+					echo "Clearing: $key $value<br>";
+					setcookie($key, "", time()-1*60*60, "/SWAP-TP"); // path needs to match the initial setcookie() call
+				}
+			}
+
+			$query2=$con->prepare("SELECT * from `users` WHERE `ID`=?");
+			$query2->bind_param('i',$userId);
+			if($query2->execute()){ 
+				$result2 = $query2->get_result();
+				$row2 = $result2->fetch_assoc();
+				$logStatus = 1;
+				logAttempt($row2['email'],$logStatus); //log successful login attempt
+				resetAttempt($row2['email']); //reset anything failed attempts just in case
+				attendanceCheck($row2['ID']);
+				session_set_cookie_params([
+					'lifetime' => '86400',
+					'path' => '/SWAP-TP',
+					'domain' => '',
+					'secure' => TRUE,
+					'httponly' => TRUE,
+					'samesite' => 'Strict'
+				]);
+				session_start();
+				if(isset($_COOKIE['PHPSESSID'])){
+					echo $_COOKIE['PHPSESSID']."<br>Redundant cookie named PHPSESSID containing session ID to be removed.";
+					setcookie('PHPSESSID', "", time()-1*60*60, "/");
+					session_unset(); // remove/unset/free all session variables
+					session_destroy(); //destroy the session 
+					session_start(); //start a NEW session
+					session_regenerate_id(); //regenerate a new session ID because old one was destroyed
+					$_SESSION["ID"]=$row2['ID'];
+					$_SESSION['email'] = $row2['email']; 
+					$_SESSION["role"]=$row2['role'];
+					$_SESSION["occupation"]=$row2['occupation'];
+					$_SESSION["department"]=$row2['department'];
+					$_SESSION["status"]=$row2['status'];
+				}
+				else{
+					//session_set_cookie_params(30*24*60*60,"/SWAP-TP", "",TRUE,TRUE); //this is non strict (non same site only)
+					$_SESSION["ID"]=$row2['ID']; 
+					$_SESSION['email'] = $row2['email']; 
+					$_SESSION["role"]=$row2['role'];
+					$_SESSION["occupation"]=$row2['occupation'];
+					$_SESSION["department"]=$row2['department'];
+					$_SESSION["status"]=$row2['status'];
+				}
+				if($_SESSION['status'] === -1){
+					header("Location: https://localhost/SWAP-TP/firstPassChange.php");
+					die();
+				}
+				else{
+					header("Location: https://localhost/SWAP-TP/index.php");
+					die();
+				}
+			} 
+		}
+		else{
+			echo "<p class='AlreadyLoggedInText'>Wrong 2FA Password.<a href='2FA.php'> Back:</a></p>";
+			die();
+		}
 	}
 }
 ?>

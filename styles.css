@@ -322,3 +322,9 @@
     white-space: nowrap;
     padding-left: 10px;
 }
+.qrFlex{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
