@@ -17,7 +17,7 @@
         echo "Only permitted for Users.";
         die();
     }
-    elseif(!isset($_SESSION['2faURL'])){
+    elseif(!isset($_SESSION['2faURL']) || !isset($_SESSION['recoveryCode'])){
         echo "Permission Denied.";
         die();
     }
@@ -32,7 +32,9 @@
     ?>
     <div class="container qrFlex">
         <img src="<?= $imageURL ?>" style='margin-top: 3rem;'>
-        <div class="loginForm">
+        <p style='color: white; margin-top: 1rem;'>Your recovery code is: <span style = 'color: #915F6D;'><?= $_SESSION['recoveryCode']; ?></span></p>
+        <p style='color: white;'>Please keep a copy of the recovery code in case you lost access to your authenticator. For any inquiries or support, please contact tpamcIT@tp.edu.sg</p>
+        <div class="loginForm" style='margin-top: 1rem;'>
             <form method="post" action="qrCode.php">
                 <input type="submit" value="Back to Login Page" name="Submit" class="BackButton">
             </form>

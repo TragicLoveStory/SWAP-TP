@@ -502,8 +502,11 @@ function addQRCode(){
 		$google2fa = new \PragmaRX\Google2FA\Google2FA();
 		$secret = $google2fa->generateSecretKey();
 		
-		$query2=$con->prepare("INSERT INTO `2fa` (`userId`,`secret`) VALUES (?,?)");
-		$query2->bind_param('is',$_SESSION['ID'], $secret);
+		include_once 'mailFunctions.php';
+		$recoveryString = generateRandomString();
+
+		$query2=$con->prepare("INSERT INTO `2fa` (`userId`,`secret`,`recovery`) VALUES (?,?,?)");
+		$query2->bind_param('iss',$_SESSION['ID'], $secret, $recoveryString);
 		if($query2->execute()){
 			$text = $google2fa->getQRCodeUrl(
 				'TPAMC.com',
@@ -512,6 +515,7 @@ function addQRCode(){
 			);
 			$image_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl='.$text;
 			$_SESSION['2faURL'] = $image_url;
+			$_SESSION['recoveryCode'] = $recoveryString;
 			header("Location: https://localhost/SWAP-TP/qrCode.php");
 			die();
 			
@@ -521,8 +525,11 @@ function addQRCode(){
 		$google2fa = new \PragmaRX\Google2FA\Google2FA();
 		$newSecret = $google2fa->generateSecretKey();
 
-		$query3=$con->prepare("UPDATE `2fa` SET `secret` = ? WHERE `userId`=?");
-		$query3->bind_param('si', $newSecret, $_SESSION['ID']); //bind the parameters
+		include_once 'mailFunctions.php';
+		$newRecoveryString = generateRandomString();
+
+		$query3=$con->prepare("UPDATE `2fa` SET `secret` = ?, `recovery` = ? WHERE `userId`=?");
+		$query3->bind_param('ssi', $newSecret, $newRecoveryString, $_SESSION['ID']); //bind the parameters
 		if($query3->execute()){
 			$text = $google2fa->getQRCodeUrl(
 				'TPAMC.com',
@@ -531,6 +538,7 @@ function addQRCode(){
 			);
 			$image_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl='.$text;
 			$_SESSION['2faURL'] = $image_url;
+			$_SESSION['recoveryCode'] = $newRecoveryString;
 			header("Location: https://localhost/SWAP-TP/qrCode.php");
 			die();
 			

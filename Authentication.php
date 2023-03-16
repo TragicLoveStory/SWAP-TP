@@ -630,4 +630,42 @@ function authenticate2FA($userId,$userInput){
 		}
 	}
 }
+
+function recover2FA($userId,$recoveryInput){
+	require "config.php";
+	date_default_timezone_set('Singapore');
+	try {
+	$con=mysqli_connect($db_hostname,$db_username,$db_password,$db_database);
+	}
+	catch (Exception $e) {
+		printerror($e->getMessage(),$con);
+	}
+	if (!$con) {
+		printerror("Connecting to $db_hostname", $con);
+		die();
+	}
+	
+	$query=$con->prepare("SELECT * from `2fa` WHERE `userId`=?");
+    $query->bind_param('i',$userId);
+	if($query->execute()){ 
+        $result = $query->get_result();
+        $row = $result->fetch_assoc();
+		if ($row['recovery'] == $recoveryInput){
+			$defaultOtpStatus = -1;
+			$query2=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
+    		$query2->bind_param('ii', $defaultOtpStatus, $userId);
+			if($query2->execute()){
+				$query3=$con->prepare("DELETE FROM `2fa` WHERE `userId` = ?");
+    			$query3->bind_param('i',$userId);
+				if($query3->execute()){
+					logout();
+				}
+			}
+		}
+		else{
+			echo "<p class='AlreadyLoggedInText'>Wrong Recovery Code, please contact tpamcIT@tp.edu.sg for any support or inquiries.<a href='2FA.php'> Back:</a></p>";
+			die();
+		}
+	}
+}
 ?>

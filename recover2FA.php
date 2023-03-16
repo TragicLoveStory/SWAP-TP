@@ -21,14 +21,9 @@
     $initializationIV = "";
     $AES128_ECB="aes-128-ecb";
     $decryptedvalue = openssl_decrypt($_COOKIE['aobing'], $AES128_ECB, $key, $options=0, $initializationIV);
-     if(isset($_POST['Submit']) && $_POST['Submit'] === "Submit 2FA"){
-        if(!empty($_POST['2FAInput'])){
-            if(strlen($_POST['2FAInput']) !== 6){
-                $errorMessage = "Invalid 2FA.";
-            }
-            else{
-                authenticate2FA($decryptedvalue,$_POST['2FAInput']);
-            }
+     if(isset($_POST['Submit']) && $_POST['Submit'] === "Submit Recovery Code"){
+        if(!empty($_POST['RecoveryInput'])){
+            recover2FA($decryptedvalue,$_POST['RecoveryInput']);
         }
         else{
             $errorMessage =  "Error: Empty Field";
@@ -37,12 +32,10 @@
     ?>
     <div class="container">
         <div class="loginForm">
-            <form method="post" action="2FA.php">
-                <input type="text" name="2FAInput" placeholder="Enter 2FA Here" class="inputField">
-                <input type="submit" value="Submit 2FA" name="Submit" class="signInButton">
+            <form method="post" action="recover2FA.php">
+                <input type="text" name="RecoveryInput" placeholder="Enter Recovery Code" class="inputField">
+                <input type="submit" value="Submit Recovery Code" name="Submit" class="signInButton">
             </form>
-            <hr>
-            <a href="recover2FA.php" class="loginAnchor">Lost 2FA Access?</a>
             <p style="color: #FFFFFF; text-align: center; margin-top: 1rem;"><?= $errorMessage ?></p>
         </div>
     </div>
