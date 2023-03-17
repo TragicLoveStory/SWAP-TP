@@ -565,7 +565,12 @@ function disable2FA(){
 	$query=$con->prepare("UPDATE `users` SET `otp` = ? WHERE `ID`=?");
 	$query->bind_param('ii', $otpStatus, $_SESSION['ID']); //bind the parameters
 	if($query->execute()){ //executing query (processes and print the results)
-		logout();
+		$query=$con->prepare("DELETE FROM `2fa` WHERE `userId` = ?");
+		$query->bind_param('i',$_SESSION['ID']);
+		if($query->execute()){
+			logout();
+		}
+		
 	}
 	else{
 		echo "Error Executing Query";
