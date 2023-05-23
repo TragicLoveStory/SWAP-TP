@@ -261,7 +261,7 @@ function login($email,$password,$recaptcha){
         else{
 			resetAttempt($email);
 
-			$secret_key = '6Lc9GR0kAAAAAOuYLevKn3oYBIErSwwKb70Wr3up';
+			$secret_key = 'reCaptcha secret key here!';
 			// Hitting request to the URL, Google will
     		// respond with success or error scenario
 			$url= 'https://www.google.com/recaptcha/api/siteverify?secret='.$secret_key.'&response='.$recaptcha;
